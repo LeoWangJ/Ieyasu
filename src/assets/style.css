@@ -1,0 +1,6 @@
+@layer base {
+  :root {
+    --color-theme: theme('colors.orange'); 
+    --color-bg-primary: theme('colors.gray'); 
+  }
+}
