@@ -1,6 +1,7 @@
 @layer base {
   :root {
-    --color-theme: theme('colors.orange'); 
+    --color-theme: theme('colors.purple'); 
     --color-bg-primary: theme('colors.gray'); 
+    --color-text-theme: theme('colors.purple'); 
   }
 }

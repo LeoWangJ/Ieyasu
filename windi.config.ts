@@ -11,15 +11,16 @@ export default defineConfig({
         gray: '#f6f3f3',
         lightBlack: '#363636',
         darkBlack: '#202020',
-        orange: '#FB9904',
-        red: '#FB0404',
-        
+        purple: '#9b4dca'
       }
     },
     backgroundColor: {
       theme: 'var(--color-theme)',
-      primary: 'var(--color-bg-primary)',
+      primary: 'var(--color-bg-primary)'
     },
+    textColor: {
+      theme: 'var(--color-text-theme)'
+    }
 
   }
 })

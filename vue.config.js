@@ -1,19 +1,24 @@
 const { defineConfig } = require('@vue/cli-service')
-const webpack = require('webpack');
+const webpack = require('webpack')
+const { VantResolver } = require('unplugin-vue-components/resolvers')
+const ComponentsPlugin = require('unplugin-vue-components/webpack')
 
 module.exports = defineConfig({
   transpileDependencies: true,
   pluginOptions: {
     windicss: {
       // see https://github.com/windicss/vite-plugin-windicss/blob/main/packages/plugin-utils/src/options.ts
-    },
+    }
   },
   configureWebpack: {
     plugins: [
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
-        process: 'process/browser',
+        process: 'process/browser'
       }),
+      ComponentsPlugin({
+        resolvers: [VantResolver()]
+      })
     ],
     resolve: {
       fallback: {
@@ -24,8 +29,8 @@ module.exports = defineConfig({
         http: require.resolve('stream-http'),
         https: require.resolve('https-browserify'),
         url: require.resolve('url/'),
-        os: require.resolve('os-browserify/browser'),
-      },
-    },
-  },
+        os: require.resolve('os-browserify/browser')
+      }
+    }
+  }
 })
