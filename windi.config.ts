@@ -6,7 +6,6 @@ export default defineConfig({
   theme: {
     extend: {
       colors: {
-        white: colors.white,
         black: colors.black,
         gray: '#f6f3f3',
         lightBlack: '#363636',

@@ -1,16 +1,92 @@
 <script setup lang="ts">
 import { ethers } from 'ethers'
 import { ERC725 } from '@erc725/erc725.js'
-import LSP5ReceivedAssetsSchema from '@erc725/erc725.js/schemas/LSP5ReceivedAssets.json'
+import type { ERC725JSONSchema } from '@erc725/erc725.js'
+import LSP3UniversalProfileMetaDataSchema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
+import { reactive } from 'vue'
+import { IPFS_GATEWAY_BASE_URL } from '../utils'
+import { Tag, Toast } from 'vant'
+import { useClipboard } from '@vueuse/core'
 
-// const universalProfileAddress = ''
-console.log(ethers, LSP5ReceivedAssetsSchema, ERC725)
+const ethereumProvider = new ethers.providers.Web3Provider(window.ethereum)
+const accounts = await ethereumProvider.listAccounts()
+const address = accounts[0]
+const profile = new ERC725(LSP3UniversalProfileMetaDataSchema as ERC725JSONSchema[], address, ethereumProvider.provider, {
+  ipfsGateway: IPFS_GATEWAY_BASE_URL // todo the gateway should be without /ipfs/
+})
+interface Image {
+  hash:string
+  url:string
+  hashFunction: string
+  height:number
+  width:number
+}
 
-const provider = new ethers.providers.Web3Provider(window.ethereum)
-console.log(provider)
-// const erc725LSP12IssuedAssets = new ERC725js(LSP5ReceivedAssetsSchema, universalProfileAddress, provider);
+interface LSP3Profile {
+  address:string
+  description:string
+  name:string
+  tags: string[]
+  backgroundImage:Image[]
+  profileImage:Image[]
+  links:{title:string, url:string}[]
+}
+
+let info = reactive<LSP3Profile>({
+  address: '',
+  description: '',
+  name: '',
+  tags: [],
+  backgroundImage: [],
+  profileImage: [],
+  links: []
+})
+info.address = address
+const { copy, copied } = useClipboard({ source: address })
+try {
+  const metaData = await profile.fetchData('LSP3Profile')
+  info = {
+    ...info,
+    ...metaData.value?.LSP3Profile
+  }
+} catch (e) {
+  console.log(e)
+}
+
+const handlerIPFSImg = (url:string, ipfs = IPFS_GATEWAY_BASE_URL) => {
+  return url.replace('ipfs://', ipfs)
+}
+
+const copyHandler = () => {
+  copy()
+  if (copied) return Toast.success('copied!')
+}
 </script>
 
 <template>
-  <div>personal file</div>
+  <div class="relative w-full mx-auto">
+    <img
+      v-if="info.backgroundImage[0]?.url"
+      class="w-full h-[55vw] sm:(h-300px)"
+      :src="handlerIPFSImg(info.backgroundImage[0].url)"
+      alt="avatar-bg">
+    <div class="flex flex-col mt-[8%] text-primary w-full inset-0 absolute items-center">
+      <div class="rounded-full mx-auto h-[20vw] w-[20vw] overflow-hidden sm:(w-[129px] h-[129px]) ">
+        <img
+          class="h-full w-full"
+          :src="handlerIPFSImg(info.profileImage[0]?.url)"
+          alt="profile-avatar">
+      </div>
+      <div class="mt-5 mb-1 text-center text-[white]">
+        <div class="text-shadow-lg">
+          {{ `${info.address.slice(0,8)}...${info.address.slice(-6)}` }}
+          <van-icon name="link-o" @click="copyHandler" class="cursor-pointer"/>
+        </div>
+        <div class="text-shadow-lg">{{ info.name }}</div>
+        <div class="mt-1 text-sm">
+          <Tag class="mr-1" v-for="(item,index) in info.tags" :key="index">{{item }}</Tag>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>

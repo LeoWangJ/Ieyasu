@@ -10,5 +10,6 @@ declare module '@vue/runtime-core' {
     ProfileInfo: typeof import('./src/components/ProfileInfo.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    VanIcon: typeof import('vant/es')['Icon']
   }
 }
