@@ -4,10 +4,10 @@ import { ERC725 } from '@erc725/erc725.js'
 import type { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP3UniversalProfileMetaDataSchema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
 import { reactive } from 'vue'
-import { IPFS_GATEWAY_BASE_URL } from '../utils'
+import { IPFS_GATEWAY_BASE_URL } from '../utils/config'
 import { Tag, Toast } from 'vant'
 import { useClipboard } from '@vueuse/core'
-
+import { handlerIPFSImg } from '@/utils'
 const ethereumProvider = new ethers.providers.Web3Provider(window.ethereum)
 const accounts = await ethereumProvider.listAccounts()
 const address = accounts[0]
@@ -51,10 +51,6 @@ try {
   }
 } catch (e) {
   console.log(e)
-}
-
-const handlerIPFSImg = (url:string, ipfs = IPFS_GATEWAY_BASE_URL) => {
-  return url.replace('ipfs://', ipfs)
 }
 
 const copyHandler = () => {

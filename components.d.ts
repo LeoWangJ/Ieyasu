@@ -7,9 +7,13 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    LSP12CreatedAssets: typeof import('./src/components/LSP12CreatedAssets.vue')['default']
+    LSP5ReceivedAssets: typeof import('./src/components/LSP5ReceivedAssets.vue')['default']
+    NFTAssets: typeof import('./src/components/NFTAssets.vue')['default']
     ProfileInfo: typeof import('./src/components/ProfileInfo.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TokenAssets: typeof import('./src/components/TokenAssets.vue')['default']
     VanIcon: typeof import('vant/es')['Icon']
   }
 }

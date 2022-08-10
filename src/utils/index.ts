@@ -1,1 +1,5 @@
-export const IPFS_GATEWAY_BASE_URL = 'https://2eff.lukso.dev/ipfs/'
+import { IPFS_GATEWAY_BASE_URL } from './config'
+
+export const handlerIPFSImg = (url:string, ipfs = IPFS_GATEWAY_BASE_URL) => {
+  return url.replace('ipfs://', ipfs)
+}
