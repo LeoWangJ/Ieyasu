@@ -10,7 +10,7 @@ import { Cell } from 'vant'
 
 const props = defineProps<{
   address: string,
-  tokenId: string | null
+  tokenId?: string | null
 }>()
 
 onMounted(async () => {
@@ -38,10 +38,12 @@ const getAssets = async () => {
   const metadata = await controller.fetchData([
     'LSP4TokenName',
     'LSP4TokenSymbol',
-    {
-      keyName: 'LSP8MetadataJSON:<bytes32>',
-      dynamicKeyParts: props.tokenId
-    },
+    props.tokenId
+      ? {
+          keyName: 'LSP8MetadataJSON:<bytes32>',
+          dynamicKeyParts: props.tokenId
+        }
+      : 'LSP4Metadata',
     'LSP4Metadata'
   ])
   console.log(metadata)

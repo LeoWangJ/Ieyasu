@@ -5,6 +5,27 @@ export const INTERFACEID = {
   LSP8IdentifiableDigitalAsset: '0x49399145'
 }
 
+export const COMMON_ABIS = {
+  supportsInterface: {
+    inputs: [
+      {
+        internalType: 'bytes4',
+        name: 'interfaceId',
+        type: 'bytes4'
+      }
+    ],
+    name: 'supportsInterface',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
+  }
+}
 export const LSP8MetadataJSONSchema = {
   name: 'LSP8MetadataJSON:<bytes32>',
   key: '0x9a26b4060ae7f7d5e3cd0000<bytes32>',

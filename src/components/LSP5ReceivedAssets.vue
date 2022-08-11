@@ -7,7 +7,7 @@ import LSP8IdentifiableDigitalAsset from '@lukso/lsp-smart-contracts/artifacts/L
 import { getEthers } from '@/composables/ethers'
 import { ethers } from 'ethers'
 import { INTERFACEID } from '@/utils/config'
-// import TokenAssets from './TokenAssets.vue'
+import TokenAssets from './TokenAssets.vue'
 import NFTAssets from './NFTAssets.vue'
 import type { ReceivedTokens } from '@/utils/types'
 
