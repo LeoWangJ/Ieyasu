@@ -53,11 +53,6 @@ const openDialog = () => {
   const isCreated = props.location === LOCATION.created
   component.value = isCreated ? MintToken : SendAssets
   showDialog.value = true
-  if (props.location === LOCATION.created) {
-    console.log('mint')
-  } else {
-    console.log('send')
-  }
 }
 </script>
 

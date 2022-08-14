@@ -7,6 +7,6 @@ export interface NFT {
   name: string
   symbol: string
   icon: string
-  balance: number | string
+  balance?: number | string
   address: string
 }

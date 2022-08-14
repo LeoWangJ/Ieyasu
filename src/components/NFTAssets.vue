@@ -2,34 +2,40 @@
 import ERC725js from '@erc725/erc725.js'
 import type { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP4DigitalAssetSchema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
-import { onMounted, reactive } from 'vue'
-import { IPFS_GATEWAY_BASE_URL, LSP8MetadataJSONSchema } from '@/utils/config'
+import LSP7DigitalAssetSchema from '@lukso/lsp-smart-contracts/artifacts/LSP7DigitalAsset.json'
+import { onMounted, reactive, ref, shallowRef } from 'vue'
+import { IPFS_GATEWAY_BASE_URL, LSP8MetadataJSONSchema, LOCATION } from '@/utils/config'
 import { getEthers } from '@/composables/ethers'
 import { handlerIPFSImg } from '@/utils'
-import { Cell } from 'vant'
+import { Cell, Dialog } from 'vant'
+import MintNFT from './MintNFT.vue'
+import SendAssets from './SendAssets.vue'
+import { NFT } from '@/utils/types'
+import { ethers } from 'ethers'
 
+const DialogComponent = Dialog.Component
 const props = defineProps<{
   address: string,
-  tokenId?: string | null
+  tokenId?: string | null,
+  location: string
 }>()
 
 onMounted(async () => {
   await getAssets()
 })
-interface NFT {
-  name: string
-  symbol: string
-  icon: string
-}
 
 const nft = reactive<NFT>({
   name: '',
   symbol: '',
-  icon: ''
+  icon: '',
+  balance: 0,
+  address: props.address
 })
+const showDialog = ref(false)
+const component:any = shallowRef(undefined)
 
 const getAssets = async () => {
-  const { provider } = await getEthers()
+  const { provider, ethereumProvider, account } = await getEthers()
   const controller = new ERC725js([...LSP4DigitalAssetSchema, LSP8MetadataJSONSchema] as ERC725JSONSchema[], props.address, provider, {
     ipfsGateway: IPFS_GATEWAY_BASE_URL
   })
@@ -54,9 +60,13 @@ const getAssets = async () => {
   } catch (error) {
     nft.icon = handlerIPFSImg(metadata[3].value.LSP4Metadata.icon[0].url)
   }
+  const lsp4DigitalAssetContract = new ethers.Contract(props.address, LSP7DigitalAssetSchema.abi, ethereumProvider)
+  nft.balance = await lsp4DigitalAssetContract.balanceOf(account)
 }
 const openDialog = () => {
-  console.log('1')
+  const isCreated = props.location === LOCATION.created
+  component.value = isCreated ? MintNFT : SendAssets
+  showDialog.value = true
 }
 </script>
 
@@ -72,8 +82,18 @@ const openDialog = () => {
       @click="openDialog">
       <template #title>
           {{ nft.name }}<span v-if="nft.symbol">({{nft.symbol}})</span>
+          <span>{{LOCATION.created === location?  `Supply : ${nft.balance}`: `` }}</span>
       </template>
   </Cell>
+  <DialogComponent
+    v-model:show="showDialog"
+    teleport="body"
+    width="100%"
+    :overlay="false"
+    :show-confirm-button="false"
+    class="h-full !bg-primary !rounded-none max-w-screen-md">
+    <component :is="component"  v-model:show="showDialog" :assets="nft"></component>
+  </DialogComponent>
   </div>
 </template>
 

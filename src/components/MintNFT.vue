@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import LSP7DigitalAsset from '@lukso/lsp-smart-contracts/artifacts/LSP7Mintable.json'
+import { onMounted, reactive, ref } from 'vue'
+import LSP8Mintable from '@lukso/lsp-smart-contracts/artifacts/LSP8Mintable.json'
 import { getEthers } from '@/composables/ethers'
 import { NFT } from '@/utils/types'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
@@ -18,7 +18,11 @@ const disabled = ref(false)
 const error = ref('')
 const step = ref(0)
 const isMinterEOA = ref(false)
-const mintAmount = ref(0)
+const mintInfo = reactive({
+  tokenId: '',
+  icon: null,
+  description: ''
+})
 const txHash = ref('')
 const emit = defineEmits(['update:show'])
 
@@ -34,8 +38,8 @@ const mint = async () => {
   step.value = 1
   disabled.value = true
   error.value = ''
-  if (mintAmount.value === 0) {
-    error.value = "Amount can't empty"
+  if (mintInfo.tokenId === '') {
+    error.value = "tokenID can't empty"
     step.value = 0
     disabled.value = false
     return
@@ -45,10 +49,10 @@ const mint = async () => {
   if (isEOAccount) {
     isMinterEOA.value = true
   }
-  const amount = ethers.utils.parseEther(`${mintAmount.value}`)
+  const paddedTokenId = ethers.utils.formatBytes32String(`${mintInfo.tokenId}`)
   try {
-    const LSP7DigitalAssetContract = new ethers.Contract(props.assets.address, LSP7DigitalAsset.abi, signer)
-    const receipt = await LSP7DigitalAssetContract.mint(account, amount.toString(), isMinterEOA.value, '0x')
+    const lsp8IdentifiableDigitalAssetContract = new ethers.Contract(props.assets.address, LSP8Mintable.abi, signer)
+    const receipt = await lsp8IdentifiableDigitalAssetContract.mint(account, paddedTokenId, isMinterEOA.value, '0x')
     txHash.value = receipt.hash
     if (isEOAccount) {
       const LSP5ReceivedAssets = JSON.parse(localStorage.getItem('receivedAssets'))
@@ -64,8 +68,8 @@ const mint = async () => {
     disabled.value = false
     return
   }
-  step.value = 2
   Toast.success('success!')
+  step.value = 2
   disabled.value = false
 }
 const clickNavBar = () => {
@@ -79,7 +83,7 @@ const clickNavBar = () => {
     error.value = ''
     step.value = 0
     isMinterEOA.value = false
-    mintAmount.value = 0
+    mintInfo.tokenId = ''
     txHash.value = ''
     emit('update:show', false)
   }
@@ -87,9 +91,9 @@ const clickNavBar = () => {
 </script>
 
 <template>
-  <van-nav-bar :title="`Mint ${assets.name}(${assets.symbol})`" left-arrow @click-left="clickNavBar"/>
+  <van-nav-bar :title="`Mint ${assets.name}(${assets.symbol}) Collection`" left-arrow @click-left="clickNavBar"/>
   <van-steps :active="step" active-icon="success" active-color="#38f">
-    <van-step>Input Mint Amount</van-step>
+    <van-step>Input NFT Collection Infomation</van-step>
     <van-step>Minting</van-step>
     <van-step>🎉 Success</van-step>
   </van-steps>
@@ -97,8 +101,8 @@ const clickNavBar = () => {
     Please switch your network to LUKSO <span class="cursor-pointer text-theme" @click="addLuksoL16Testnet">L16 </span>to create this token.
   </p>
   <div v-if="step == 0">
-    <van-field v-model.number="mintAmount" placeholder="mint amount" number label="Mint Amount"/>
-    <van-button type="primary" @click="mint" :disabled="disabled">MINT TOKEN</van-button>
+    <van-field v-model.number="mintInfo.tokenId" placeholder="tokenId" number label="Mint tokenID"/>
+    <van-button type="primary" @click="mint" :disabled="disabled">MINT NFT Collection</van-button>
   </div>
   <div v-if="step == 1">
     Minting... , please be patient!

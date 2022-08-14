@@ -61,6 +61,7 @@ onMounted(async () => {
   <div v-if="receivedNFTTokens.length">
     <p class="m-2">NFTs</p>
     <NFTAssets
+      :location="LOCATION.received"
       :address="item.address"
       :tokenId="item.tokenId"
       v-for="(item,index) in receivedNFTTokens"

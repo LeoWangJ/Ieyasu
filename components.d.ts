@@ -9,6 +9,7 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     LSP12CreatedAssets: typeof import('./src/components/LSP12CreatedAssets.vue')['default']
     LSP5ReceivedAssets: typeof import('./src/components/LSP5ReceivedAssets.vue')['default']
+    MintNFT: typeof import('./src/components/MintNFT.vue')['default']
     MintToken: typeof import('./src/components/MintToken.vue')['default']
     NFTAssets: typeof import('./src/components/NFTAssets.vue')['default']
     ProfileInfo: typeof import('./src/components/ProfileInfo.vue')['default']
