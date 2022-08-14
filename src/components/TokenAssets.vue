@@ -2,11 +2,13 @@
 import ERC725js from '@erc725/erc725.js'
 import type { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP4DigitalAssetSchema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
+import LSP7DigitalAssetSchema from '@lukso/lsp-smart-contracts/artifacts/LSP7DigitalAsset.json'
 import { onMounted, reactive } from 'vue'
-import { IPFS_GATEWAY_BASE_URL, LSP8MetadataJSONSchema } from '@/utils/config'
+import { IPFS_GATEWAY_BASE_URL } from '@/utils/config'
 import { getEthers } from '@/composables/ethers'
 import { handlerIPFSImg } from '@/utils'
 import { Cell } from 'vant'
+import { ethers } from 'ethers'
 
 const props = defineProps<{
   address: string
@@ -18,17 +20,19 @@ onMounted(async () => {
 interface NFT {
   name: string
   symbol: string
-  icon: string
+  icon: string,
+  balance: number | string
 }
 
 const token = reactive<NFT>({
   name: '',
   symbol: '',
-  icon: ''
+  icon: '',
+  balance: 0
 })
 
 const getAssets = async () => {
-  const { provider } = await getEthers()
+  const { provider, ethereumProvider, account } = await getEthers()
   const controller = new ERC725js(LSP4DigitalAssetSchema as ERC725JSONSchema[], props.address, provider, {
     ipfsGateway: IPFS_GATEWAY_BASE_URL
   })
@@ -40,6 +44,9 @@ const getAssets = async () => {
   token.name = metadata[0].value as string
   token.symbol = metadata[1].value as string
   token.icon = handlerIPFSImg(metadata[2].value.LSP4Metadata.icon[0].url)
+  const lsp4DigitalAssetContract = new ethers.Contract(props.address, LSP7DigitalAssetSchema.abi, ethereumProvider)
+  console.log('s', lsp4DigitalAssetContract)
+  token.balance = ethers.utils.formatEther(await lsp4DigitalAssetContract.balanceOf(account))
 }
 const openDialog = () => {
   console.log('1')
@@ -58,6 +65,7 @@ const openDialog = () => {
       @click="openDialog">
       <template #title>
           {{ token.name }}<span v-if="token.symbol">({{token.symbol}})</span>
+          <span>balanceOf: {{token.balance}}</span>
       </template>
   </Cell>
   </div>

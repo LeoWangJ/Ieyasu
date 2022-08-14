@@ -8,7 +8,9 @@ import { onMounted, ref } from 'vue'
 import TokenAssets from './TokenAssets.vue'
 import NFTAssets from './NFTAssets.vue'
 import { Button } from 'vant'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const receivedAssets = ref<string[]>([])
 const receivedTokens = ref<string[]>([])
 const receivedNFTTokens = ref<string[]>([])
@@ -18,6 +20,8 @@ onMounted(async () => {
     ipfsGateway: IPFS_GATEWAY_BASE_URL
   })
   const LSP12IssuedAssets = await controller.getData('LSP12IssuedAssets[]')
+  console.log('LSP12IssuedAssets:', LSP12IssuedAssets.length)
+
   receivedAssets.value = LSP12IssuedAssets.value as string[]
   receivedAssets.value.forEach(async (address) => {
     const supportsInterface = new ethers.Contract(address, [COMMON_ABIS.supportsInterface], ethereumProvider)
@@ -44,7 +48,7 @@ onMounted(async () => {
 
 <template>
   <div class="flex ">
-    <Button type="primary">CREATE TOKEN</Button>
+    <Button type="primary" @click="router.push({name: 'createToken'})">CREATE TOKEN</Button>
     <Button type="primary">CREATE NFT</Button>
   </div>
   <div v-if="receivedTokens.length">
