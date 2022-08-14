@@ -51,3 +51,8 @@ export const RPC_URLS = {
 export const BLOCK_EXPLORER_URLS = {
   L16: 'https://explorer.execution.l16.lukso.network'
 }
+
+export const LOCATION = {
+  created: 'created',
+  received: 'received'
+}

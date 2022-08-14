@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getEthers } from '@/composables/ethers'
-import { COMMON_ABIS, INTERFACEID, IPFS_GATEWAY_BASE_URL } from '@/utils/config'
+import { COMMON_ABIS, INTERFACEID, IPFS_GATEWAY_BASE_URL, LOCATION } from '@/utils/config'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP12IssuedAssetsSchema from '@erc725/erc725.js/schemas/LSP12IssuedAssets.json'
 import { ethers } from 'ethers'
@@ -9,7 +9,6 @@ import TokenAssets from './TokenAssets.vue'
 import NFTAssets from './NFTAssets.vue'
 import { Button } from 'vant'
 import { useRouter } from 'vue-router'
-
 const router = useRouter()
 const receivedAssets = ref<string[]>([])
 const receivedTokens = ref<string[]>([])
@@ -54,6 +53,7 @@ onMounted(async () => {
   <div v-if="receivedTokens.length">
     <p class="m-2">TOKENs</p>
     <TokenAssets
+      :location="LOCATION.created"
       v-for="(address,index) in receivedTokens"
       :address="address"
       :key="index">

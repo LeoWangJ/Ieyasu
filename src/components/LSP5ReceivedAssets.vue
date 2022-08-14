@@ -6,7 +6,7 @@ import LSP5ReceivedAssetsSchema from '@erc725/erc725.js/schemas/LSP5ReceivedAsse
 import LSP8IdentifiableDigitalAsset from '@lukso/lsp-smart-contracts/artifacts/LSP8IdentifiableDigitalAsset.json'
 import { getEthers } from '@/composables/ethers'
 import { ethers } from 'ethers'
-import { INTERFACEID } from '@/utils/config'
+import { INTERFACEID, LOCATION } from '@/utils/config'
 import TokenAssets from './TokenAssets.vue'
 import NFTAssets from './NFTAssets.vue'
 import type { ReceivedTokens } from '@/utils/types'
@@ -52,6 +52,7 @@ onMounted(async () => {
   <div v-if="receivedTokens.length">
     <p class="m-2">TOKENs</p>
     <TokenAssets
+      :location="LOCATION.received"
       :address="item.address"
       v-for="(item,index) in receivedTokens"
       :key="index">

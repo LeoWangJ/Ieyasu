@@ -3,34 +3,34 @@ import ERC725js from '@erc725/erc725.js'
 import type { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP4DigitalAssetSchema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
 import LSP7DigitalAssetSchema from '@lukso/lsp-smart-contracts/artifacts/LSP7DigitalAsset.json'
-import { onMounted, reactive } from 'vue'
-import { IPFS_GATEWAY_BASE_URL } from '@/utils/config'
+import { onMounted, reactive, ref, shallowRef } from 'vue'
+import { IPFS_GATEWAY_BASE_URL, LOCATION } from '@/utils/config'
 import { getEthers } from '@/composables/ethers'
 import { handlerIPFSImg } from '@/utils'
-import { Cell } from 'vant'
+import { Cell, Dialog } from 'vant'
 import { ethers } from 'ethers'
-
+import MintToken from './MintToken.vue'
+import SendAssets from './SendAssets.vue'
+import { NFT } from '@/utils/types'
 const props = defineProps<{
-  address: string
+  address: string,
+  location: string
 }>()
-
+const DialogComponent = Dialog.Component
 onMounted(async () => {
   await getAssets()
 })
-interface NFT {
-  name: string
-  symbol: string
-  icon: string,
-  balance: number | string
-}
 
 const token = reactive<NFT>({
   name: '',
   symbol: '',
   icon: '',
-  balance: 0
+  balance: 0,
+  address: props.address
 })
 
+const showDialog = ref(false)
+const component:any = shallowRef(undefined)
 const getAssets = async () => {
   const { provider, ethereumProvider, account } = await getEthers()
   const controller = new ERC725js(LSP4DigitalAssetSchema as ERC725JSONSchema[], props.address, provider, {
@@ -48,8 +48,16 @@ const getAssets = async () => {
   console.log('s', lsp4DigitalAssetContract)
   token.balance = ethers.utils.formatEther(await lsp4DigitalAssetContract.balanceOf(account))
 }
+
 const openDialog = () => {
-  console.log('1')
+  const isCreated = props.location === LOCATION.created
+  component.value = isCreated ? MintToken : SendAssets
+  showDialog.value = true
+  if (props.location === LOCATION.created) {
+    console.log('mint')
+  } else {
+    console.log('send')
+  }
 }
 </script>
 
@@ -65,10 +73,19 @@ const openDialog = () => {
       @click="openDialog">
       <template #title>
           {{ token.name }}<span v-if="token.symbol">({{token.symbol}})</span>
-          <span>balanceOf: {{token.balance}}</span>
+          <span>{{LOCATION.created === location?  `Supply`: `balanceOf` }}: {{token.balance}}</span>
       </template>
   </Cell>
   </div>
+  <DialogComponent
+    v-model:show="showDialog"
+    teleport="body"
+    width="100%"
+    :overlay="false"
+    :show-confirm-button="false"
+    class="h-full !bg-primary !rounded-none max-w-screen-md">
+    <component :is="component"  v-model:show="showDialog" :assets="token"></component>
+  </DialogComponent>
 </template>
 
 <style scoped>

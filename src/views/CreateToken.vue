@@ -90,7 +90,7 @@ const deploy = async () => {
   }
 }
 const transaction = async (deployedAssetAddress: string) => {
-  const { account, provider, ethereumProvider, signer } = await getEthers()
+  const { account, provider, signer, isEOAccount } = await getEthers()
 
   const LSP12controller = new ERC725js(LSP12IssuedAssetsSchema as ERC725JSONSchema[], account, provider, {
     ipfsGateway: IPFS_GATEWAY_BASE_URL
@@ -109,10 +109,7 @@ const transaction = async (deployedAssetAddress: string) => {
   LSP12IssuedAssets.value.push(deployedAssetAddress)
   console.log('LSP12IssuedAssets:', LSP12IssuedAssets)
 
-  // if EOA, also add new asset list to localStorage
-  const bytecode = await ethereumProvider.getCode(account)
-
-  if (bytecode === '0x') {
+  if (isEOAccount) {
     localStorage.setItem('issuedAssets', JSON.stringify(LSP12IssuedAssets))
   }
   const encodedErc725Data = LSP12controller.encodeData([
@@ -144,7 +141,7 @@ const transaction = async (deployedAssetAddress: string) => {
     return
   }
   // Show EOA local storage warning
-  if (bytecode === '0x') {
+  if (isEOAccount) {
     isEOA.value = true
   }
   step.value = 3
