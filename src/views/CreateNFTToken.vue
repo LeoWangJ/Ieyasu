@@ -8,7 +8,7 @@ import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { useRouter } from 'vue-router'
 import { onMounted, reactive, ref } from 'vue'
 import { getEthers } from '@/composables/ethers'
-import { ethers, Signer } from 'ethers'
+import { ethers } from 'ethers'
 import { Toast, UploaderFileListItem } from 'vant'
 const router = useRouter()
 
@@ -47,12 +47,11 @@ const deploy = async () => {
   const { account, chainId, ethereumProvider } = await getEthers()
   const factory = new LSPFactory(ethereumProvider, { chainId })
   try {
-    contracts = await factory.LSP7DigitalAsset.deploy({
+    contracts = await factory.LSP8IdentifiableDigitalAsset.deploy({
       name: tokenInfo.name,
       symbol: tokenInfo.symbol,
       controllerAddress: account,
       creators: [account],
-      isNFT: false,
       digitalAssetMetadata: {
         description: tokenInfo.description,
         icon: tokenInfo.icon[0]?.file,
@@ -61,7 +60,7 @@ const deploy = async () => {
         assets: []
       }
     }, {
-      LSP7DigitalAsset: {
+      LSP8IdentifiableDigitalAsset: {
         version: undefined
       },
       ipfsGateway: IPFS_GATEWAY_API_BASE_URL,
@@ -79,8 +78,8 @@ const deploy = async () => {
         },
         complete: async (contracts) => {
           console.log('Deployment Complete')
-          console.log(contracts.LSP7DigitalAsset)
-          await transaction(contracts.LSP7DigitalAsset.address)
+          console.log(contracts.LSP8IdentifiableDigitalAsset)
+          await transaction(contracts.LSP8IdentifiableDigitalAsset.address)
         }
       }
     })
@@ -123,7 +122,7 @@ const transaction = async (deployedAssetAddress: string) => {
     {
       keyName: 'LSP12IssuedAssetsMap:<address>',
       dynamicKeyParts: deployedAssetAddress,
-      value: [INTERFACEID.LSP7DigitalAsset, (LSP12IssuedAssets.length - 1) as unknown as string]
+      value: [INTERFACEID.LSP8IdentifiableDigitalAsset, (LSP12IssuedAssets.length - 1) as unknown as string]
     }
   ])
   console.log('encodedErc725Data:', encodedErc725Data)
@@ -155,17 +154,17 @@ const transaction = async (deployedAssetAddress: string) => {
 </script>
 
 <template>
-  <van-nav-bar title="Create Token" left-arrow @click-left="router.push({name:'home'})"/>
-  <div v-if="isEOA" >The Token has been deployed and configured correctly, but because of MetaMask, the asset can only be stored in the browser's local storage.</div>
+  <van-nav-bar title="Create NFT Collection" left-arrow @click-left="router.push({name:'home'})"/>
+  <div v-if="isEOA" >The NFT Collection has been deployed and configured correctly, but because of MetaMask, the asset can only be stored in the browser's local storage.</div>
   <div v-if="!isDeploying && !deployEvent.length">
     <div v-if="isL16Network" >
-        <h2>Create your own ERC20-like Token based on <a class="text-theme" href="https://docs.lukso.tech/standards/nft-2.0/LSP7-Digital-Asset" target="_blank">LSP7</a></h2>
+        <h2>Create your own ERC721-like Collection based on <a class="text-theme" href="https://docs.lukso.tech/standards/nft-2.0/LSP8-Identifiable-Digital-Asset" target="_blank">LSP8</a></h2>
         <van-field v-model="tokenInfo.name" placeholder="Name" />
         <van-field v-model="tokenInfo.symbol" placeholder="Token Symbol" />
         <van-field v-model="tokenInfo.description" placeholder="Description" />
-      <div>Token Icon</div>
+      <div>NFT Collection Icon</div>
       <van-uploader v-model="tokenInfo.icon" multiple :max-count="2" />
-      <van-button type="primary" @click="deploy" :disabled="disabled">DEPLOY TOKEN</van-button>
+      <van-button type="primary" @click="deploy" :disabled="disabled">DEPLOY NFT Collection</van-button>
     </div>
     <p v-else>
       Please switch your network to LUKSO <span class="cursor-pointer text-theme" @click="addLuksoL16Testnet">L16 </span>to create this token.

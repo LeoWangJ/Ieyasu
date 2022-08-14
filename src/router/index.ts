@@ -15,6 +15,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/create-token',
     name: 'createToken',
     component: () => import('../views/CreateToken.vue')
+  },
+  {
+    path: '/create-nft-token',
+    name: 'createNFTToken',
+    component: () => import('../views/CreateNFTToken.vue')
   }
 ]
 

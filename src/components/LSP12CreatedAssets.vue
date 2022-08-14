@@ -49,7 +49,7 @@ onMounted(async () => {
 <template>
   <div class="flex ">
     <Button type="primary" @click="router.push({name: 'createToken'})">CREATE TOKEN</Button>
-    <Button type="primary">CREATE NFT</Button>
+    <Button type="primary" @click="router.push({name: 'createNFTToken'})">CREATE NFT</Button>
   </div>
   <div v-if="receivedTokens.length">
     <p class="m-2">TOKENs</p>
