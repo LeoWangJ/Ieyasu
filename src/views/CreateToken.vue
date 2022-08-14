@@ -184,19 +184,20 @@ const transaction = async (deployedAssetAddress: string) => {
     </div>
     <div v-for="(event, index) in deployEvent" :key="index">
       <span v-if="event.type === 'PROXY_DEPLOYMENT' && event.status === 'COMPLETE'">
-        Contract deployed: {{ event.contractName }} ({{ event.type }}): <a :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/address/${event.contractAddress}`" target="_blank">{{ event.contractAddress }}</a
+        Contract deployed: {{ event.contractName }} ({{ event.type }}): <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/address/${event.contractAddress}`" target="_blank">{{ event.contractAddress }}</a
         ><br />
-        Transaction hash: <a :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${event.receipt.transactionHash}`" target="_blank">{{ event.receipt.transactionHash }}</a>
+        Transaction hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${event.receipt.transactionHash}`" target="_blank">{{ event.receipt.transactionHash }}</a>
       </span>
       <br />
       <span v-if="event.type === 'TRANSACTION' && event.status === 'COMPLETE'">
         Function called: {{ event.functionName }}()<br />
-        Transaction hash: <a :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${event.receipt.transactionHash}`" target="_blank">{{ event.receipt.transactionHash }}</a>
+        Transaction hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${event.receipt.transactionHash}`" target="_blank">{{ event.receipt.transactionHash }}</a>
       </span>
       <span v-if="event.type === 'TRANSACTION' && event.status === 'PENDING'">
         Function is calling: {{ event?.functionName }}()... WAIT IT!<br />
       </span>
     </div>
+    <div v-if="isSuccess">🎉 Success !!</div>
   </div>
   <p v-if="error" class="text-[red]">{{error}}</p>
 </template>
