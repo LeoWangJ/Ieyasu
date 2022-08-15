@@ -18,7 +18,6 @@ declare module '@vue/runtime-core' {
     SendAssets: typeof import('./src/components/SendAssets.vue')['default']
     TokenAssets: typeof import('./src/components/TokenAssets.vue')['default']
     VanButton: typeof import('vant/es')['Button']
-    VanDialog: typeof import('vant/es')['Dialog']
     VanField: typeof import('vant/es')['Field']
     VanIcon: typeof import('vant/es')['Icon']
     VanNavBar: typeof import('vant/es')['NavBar']

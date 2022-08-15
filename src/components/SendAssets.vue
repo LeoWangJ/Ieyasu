@@ -6,7 +6,7 @@ import { NFT } from '@/utils/types'
 import { onMounted, ref } from 'vue'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
 import { getEthers } from '@/composables/ethers'
-import ethers, { Signer } from 'ethers'
+import { ethers, Signer } from 'ethers'
 import { Toast } from 'vant'
 
 const props = defineProps<{
@@ -32,7 +32,7 @@ const checkNetwork = async () => {
   isL16Network.value = await isLuksoNetwork()
 }
 
-const send = () => {
+const send = async () => {
   step.value = 1
   error.value = ''
   disabled.value = true
@@ -55,10 +55,10 @@ const send = () => {
       const LSP5ReceivedAssets = JSON.parse(localStorage.getItem('receivedAssets'))
       LSP5ReceivedAssets.value = LSP5ReceivedAssets.value.filter(function (assetAddress: string) {
         return assetAddress !== props.assets.address
-      });
+      })
       localStorage.setItem('receivedAssets', JSON.stringify(LSP5ReceivedAssets))
     }
-  } catch (err: any) {
+  } catch (err: Error) {
     error.value = err.message
     disabled.value = false
     return
@@ -68,17 +68,17 @@ const send = () => {
   disabled.value = false
 }
 
-const sendLSP7Token = (fromAddress: string, signer: Signer) => {
+const sendLSP7Token = async (fromAddress: string, signer: Signer) => {
   const controller = new ethers.Contract(props.assets.address, LSP7DigitalAsset.abi, signer)
   const amount = ethers.utils.parseEther(`${sendAmount.value}`)
   const receipt = await controller.transfer(fromAddress, recipientAddress.value, amount, isRecipientEOA.value, '0x')
   txHash.value = receipt.hash
 }
 
-const sendLSP8Token = (fromAddress: string, signer: Signer) => {
+const sendLSP8Token = async (fromAddress: string, signer: Signer) => {
   const controller = new ethers.Contract(props.assets.address, LSP8IdentifiableDigitalAsset.abi, signer)
-  const tokenIds = await controller.tokenIdsOf(fromAddress)
-  const receipt = await controller.transfer(fromAddress, recipientAddress.value, tokenIds, isRecipientEOA.value, '0x')
+
+  const receipt = await controller.transfer(fromAddress, recipientAddress.value, props.assets.tokenId, isRecipientEOA.value, '0x')
   txHash.value = receipt.hash
 }
 

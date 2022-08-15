@@ -12,6 +12,7 @@ import MintNFT from './MintNFT.vue'
 import SendAssets from './SendAssets.vue'
 import { NFT } from '@/utils/types'
 import { ethers } from 'ethers'
+import type { Component } from 'vue'
 
 const DialogComponent = Dialog.Component
 const props = defineProps<{
@@ -30,10 +31,11 @@ const nft = reactive<NFT>({
   icon: '',
   balance: 0,
   address: props.address,
+  tokenId: props.tokenId,
   isNFT: true
 })
 const showDialog = ref(false)
-const component: any = shallowRef(undefined)
+const component: Component = shallowRef(undefined)
 
 const getAssets = async () => {
   const { provider, ethereumProvider, account } = await getEthers()
@@ -47,9 +49,9 @@ const getAssets = async () => {
     'LSP4TokenSymbol',
     props.tokenId
       ? {
-        keyName: 'LSP8MetadataJSON:<bytes32>',
-        dynamicKeyParts: props.tokenId
-      }
+          keyName: 'LSP8MetadataJSON:<bytes32>',
+          dynamicKeyParts: props.tokenId
+        }
       : 'LSP4Metadata',
     'LSP4Metadata'
   ])

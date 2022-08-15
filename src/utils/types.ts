@@ -1,4 +1,4 @@
-import { BooleanLiteral } from "@babel/types"
+import { BooleanLiteral } from '@babel/types'
 
 export interface ReceivedTokens {
   address: string
@@ -15,4 +15,5 @@ export interface NFT {
   balance?: number | string
   address: string
   isNFT?: boolean
+  tokenId?: string | null
 }

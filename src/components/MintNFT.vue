@@ -62,7 +62,7 @@ const mint = async () => {
         localStorage.setItem('receivedAssets', JSON.stringify(LSP5ReceivedAssets))
       }
     }
-  } catch (err: any) {
+  } catch (err: Error) {
     console.log(err)
     error.value = err.message
     disabled.value = false

@@ -4,6 +4,7 @@ import type { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP4DigitalAssetSchema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json'
 import LSP7DigitalAssetSchema from '@lukso/lsp-smart-contracts/artifacts/LSP7DigitalAsset.json'
 import { onMounted, reactive, ref, shallowRef } from 'vue'
+import type { Component } from 'vue'
 import { IPFS_GATEWAY_BASE_URL, LOCATION } from '@/utils/config'
 import { getEthers } from '@/composables/ethers'
 import { handlerIPFSImg } from '@/utils'
@@ -31,7 +32,7 @@ const token = reactive<NFT>({
 })
 
 const showDialog = ref(false)
-const component: any = shallowRef(undefined)
+const component:Component = shallowRef(undefined)
 const getAssets = async () => {
   const { provider, ethereumProvider, account } = await getEthers()
   const controller = new ERC725js(LSP4DigitalAssetSchema as ERC725JSONSchema[], props.address, provider, {

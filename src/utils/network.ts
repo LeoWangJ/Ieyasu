@@ -1,6 +1,5 @@
 import { BLOCK_EXPLORER_URLS, CHAIN_IDS, RPC_URLS } from './config'
 import { ethers } from 'ethers'
-import { getEthers } from '@/composables/ethers'
 export async function addLuksoL16Testnet () {
   try {
     // Open request to add custom network

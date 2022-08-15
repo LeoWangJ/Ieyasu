@@ -3,12 +3,12 @@ import LSP0ERC725Account from '@lukso/lsp-smart-contracts/artifacts/UniversalPro
 import { DeploymentEvent, LSPFactory } from '@lukso/lsp-factory.js'
 import ERC725js, { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP12IssuedAssetsSchema from '@erc725/erc725.js/schemas/LSP12IssuedAssets.json' // https://docs.lukso.tech/tools/erc725js/schemas
-import { IPFS_GATEWAY_BASE_URL, IPFS_GATEWAY_API_BASE_URL, BLOCKCHAIN_EXPLORER_BASE_URL, CHAIN_IDS, INTERFACEID } from '@/utils/config'
+import { IPFS_GATEWAY_BASE_URL, IPFS_GATEWAY_API_BASE_URL, BLOCKCHAIN_EXPLORER_BASE_URL, INTERFACEID } from '@/utils/config'
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { useRouter } from 'vue-router'
 import { onMounted, reactive, ref } from 'vue'
 import { getEthers } from '@/composables/ethers'
-import { ethers, Signer } from 'ethers'
+import { ethers } from 'ethers'
 import { Toast, UploaderFileListItem } from 'vant'
 const router = useRouter()
 
@@ -42,12 +42,11 @@ const checkNetwork = async () => {
 }
 
 const deploy = async () => {
-  let contracts
   isDeploying.value = true
   const { account, chainId, ethereumProvider } = await getEthers()
   const factory = new LSPFactory(ethereumProvider, { chainId })
   try {
-    contracts = await factory.LSP7DigitalAsset.deploy({
+    await factory.LSP7DigitalAsset.deploy({
       name: tokenInfo.name,
       symbol: tokenInfo.symbol,
       controllerAddress: account,
@@ -72,7 +71,7 @@ const deploy = async () => {
           step.value = 1
           deployEvent.value.push(deploymentEvent)
         },
-        error: (err:any) => {
+        error: (err:Error) => {
           console.log('error', err)
           isDeploying.value = false
           error.value = err.message
@@ -84,7 +83,7 @@ const deploy = async () => {
         }
       }
     })
-  } catch (err:any) {
+  } catch (err:Error) {
     isDeploying.value = false
     error.value = err.message
   }
@@ -135,7 +134,7 @@ const transaction = async (deployedAssetAddress: string) => {
     console.log('receipt:', receipt)
     step.value = 2
     deployEvent.value.push({ receipt, type: 'TRANSACTION', functionName: 'setData' })
-  } catch (err:any) {
+  } catch (err:Error) {
     console.log(err)
     error.value = err.message
     return
