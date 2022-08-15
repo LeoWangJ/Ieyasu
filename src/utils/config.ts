@@ -1,7 +1,7 @@
 export const IPFS_GATEWAY_BASE_URL = 'https://2eff.lukso.dev/ipfs/'
 export const IPFS_GATEWAY_API_BASE_URL = 'https://api.2eff.lukso.dev:443'
 
-export const BLOCKCHAIN_EXPLORER_BASE_URL = 'https://blockscout.com/lukso/l14'
+export const BLOCKCHAIN_EXPLORER_BASE_URL = 'https://explorer.execution.l16.lukso.network'
 
 export const INTERFACEID = {
   LSP7DigitalAsset: '0xe33f65c3',

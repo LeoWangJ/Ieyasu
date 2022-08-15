@@ -26,11 +26,12 @@ const token = reactive<NFT>({
   symbol: '',
   icon: '',
   balance: 0,
-  address: props.address
+  address: props.address,
+  isNFT: false
 })
 
 const showDialog = ref(false)
-const component:any = shallowRef(undefined)
+const component: any = shallowRef(undefined)
 const getAssets = async () => {
   const { provider, ethereumProvider, account } = await getEthers()
   const controller = new ERC725js(LSP4DigitalAssetSchema as ERC725JSONSchema[], props.address, provider, {
@@ -58,42 +59,33 @@ const openDialog = () => {
 
 <template>
   <div>
-    <Cell
-      size="large"
-      inset
-      center
-      class="cell truncate"
-      is-link
-      :icon="token.icon"
-      @click="openDialog">
+    <Cell size="large" inset center class="cell truncate" is-link :icon="token.icon" @click="openDialog">
       <template #title>
-          {{ token.name }}<span v-if="token.symbol">({{token.symbol}})</span>
-          <span>{{LOCATION.created === location?  `Supply`: `balanceOf` }}: {{token.balance}}</span>
+        {{ token.name }}<span v-if="token.symbol">({{ token.symbol }})</span>
+        <span>{{ LOCATION.created === location ? `Supply` : `balanceOf` }}: {{ token.balance }}</span>
       </template>
-  </Cell>
+    </Cell>
   </div>
-  <DialogComponent
-    v-model:show="showDialog"
-    teleport="body"
-    width="100%"
-    :overlay="false"
-    :show-confirm-button="false"
-    class="h-full !bg-primary !rounded-none max-w-screen-md">
-    <component :is="component"  v-model:show="showDialog" :assets="token"></component>
+  <DialogComponent v-model:show="showDialog" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
+    class="h-full max-w-screen-md !bg-primary !rounded-none">
+    <component :is="component" v-model:show="showDialog" :assets="token"></component>
   </DialogComponent>
 </template>
 
 <style scoped>
-.cell{
+.cell {
   --van-cell-border-color: black;
 }
-:deep(.van-cell){
+
+:deep(.van-cell) {
   padding-left: 5px;
 }
-:deep(.van-cell__title){
+
+:deep(.van-cell__title) {
   margin-left: 10px;
 }
-:deep(.van-cell__left-icon){
-  font-size:30px;
+
+:deep(.van-cell__left-icon) {
+  font-size: 30px;
 }
 </style>
