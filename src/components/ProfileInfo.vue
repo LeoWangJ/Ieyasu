@@ -61,17 +61,16 @@ const copyHandler = () => {
 
 <template>
   <div class="relative w-full mx-auto">
-    <img
-      v-if="info.backgroundImage[0]?.url"
+    <van-image
       class="w-full h-[55vw] sm:(h-300px)"
-      :src="handlerIPFSImg(info.backgroundImage[0].url)"
-      alt="avatar-bg">
+      :src="handlerIPFSImg(info.backgroundImage[0]?.url)"/>
     <div class="flex flex-col mt-[8%] text-primary w-full inset-0 absolute items-center">
       <div class="rounded-full mx-auto h-[20vw] w-[20vw] overflow-hidden sm:(w-[129px] h-[129px]) ">
-        <img
+        <van-image
+        round
           class="h-full w-full"
           :src="handlerIPFSImg(info.profileImage[0]?.url)"
-          alt="profile-avatar">
+          />
       </div>
       <div class="mt-5 mb-1 text-center text-[white]">
         <div class="text-shadow-lg">
