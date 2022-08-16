@@ -7,6 +7,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    LSP10Vault: typeof import('./src/components/LSP10Vault.vue')['default']
     LSP12CreatedAssets: typeof import('./src/components/LSP12CreatedAssets.vue')['default']
     LSP5ReceivedAssets: typeof import('./src/components/LSP5ReceivedAssets.vue')['default']
     MintNFT: typeof import('./src/components/MintNFT.vue')['default']

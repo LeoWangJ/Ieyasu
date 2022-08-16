@@ -1,9 +1,9 @@
-import { ethers } from 'ethers'
+import { ethers, Signer } from 'ethers'
 import { LSPFactory } from '@lukso/lsp-factory.js'
 import LSP9Vault from '@lukso/lsp-smart-contracts/artifacts/LSP9Vault.json'
 import LSP1UniversalReceiverDelegateVault from '@lukso/lsp-smart-contracts/artifacts/LSP1UniversalReceiverDelegateVault.json'
 import { RPC_URLS, CHAIN_IDS } from '@/utils/config'
-import constants from '@lukso/lsp-smart-contracts/constants.js'
+import { ERC725YKeys } from '@lukso/lsp-smart-contracts/constants.js'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import LSP6KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
 
@@ -13,7 +13,8 @@ export const createEOA = () => {
 }
 
 export const loadEOA = (privateKey:string) => {
-  const myEOA = new ethers.Wallet(privateKey)
+  const provider = ethers.getDefaultProvider()
+  const myEOA = new ethers.Wallet(privateKey, provider)
   return myEOA
 }
 
@@ -43,30 +44,27 @@ export const createURD = async (privateKey:string) => {
     data: LSP1UniversalReceiverDelegateVault.bytecode
   }, {
     from: myEOA.address,
-    gas: 5_000_000,
-    gasPrice: '1000000000'
+    gasLimit: 100000000
   })
 }
 
-export const createMyVault = async () => {
-  const myEOA = createEOA()
-  const universalProfile = await createUP(myEOA.privateKey)
-  const myVault = new ethers.Contract(myEOA.address, LSP9Vault.abi)
-  await myVault.deploy({
-    data: LSP9Vault.bytecode,
-    arguments: [universalProfile.LSP0ERC725Account?.address]
-  }, {
-    gas: 5_000_000,
-    gasPrice: '1000000000'
-  })
+export const createMyVault = async (address:string, signer:Signer) => {
+  const myVault = new ethers.ContractFactory(LSP9Vault.abi, LSP9Vault.bytecode, signer)
+  const contract = await myVault.deploy(address, { gasLimit: 1000000 })
+  try {
+    return await contract.deployed()
+  } catch (error:any) {
+    console.log('Failed to deploy in TX:', error.transactionHash)
+    throw error
+  }
 }
 
-export const settingURDAddressInStorage = async (privateKey:string) => {
+export const settingURDAddressInStorage = async (privateKey:string, myUniversalProfileAddress:string, myVaultAddress:string, myURDAddress:string) => {
   const myEOA = loadEOA(privateKey)
-  const URD_DATA_KEY = constants.ERC725YKeys.LSP0.LSP1UniversalReceiverDelegate
-  const myUniversalProfileAddress = '0x..' // address of the UP
-  const myVaultAddress = '0x..' // address of the Vault
-  const myURDAddress = '0x..' // address of the URD of the Vault
+  const URD_DATA_KEY = ERC725YKeys.LSP0.LSP1UniversalReceiverDelegate
+  // address of the UP
+  // address of the Vault
+  // address of the URD of the Vault
 
   // create an instance of the Vault
   const myLSP9Vault = new ethers.Contract(myVaultAddress, LSP9Vault.abi)
@@ -96,6 +94,6 @@ export const settingURDAddressInStorage = async (privateKey:string) => {
   // execute the executePayload on the KM
   await myKM.execute(executePayload, {
     from: myEOA.address,
-    gasLimit: 600_000
+    gasLimit: 100000000
   })
 }

@@ -2,6 +2,7 @@
 import ProfileInfo from '@/components/ProfileInfo.vue'
 import LSP5ReceivedAssets from '@/components/LSP5ReceivedAssets.vue'
 import LSP12CreatedAssets from '@/components/LSP12CreatedAssets.vue'
+import LSP10Vault from '@/components/LSP10Vault.vue'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Toast, Tab, Tabs } from 'vant'
@@ -13,7 +14,8 @@ onMounted(() => {
 const active = ref(0)
 const tabs = [
   { id: 0, name: 'Received', component: LSP5ReceivedAssets },
-  { id: 1, name: 'Created', component: LSP12CreatedAssets }
+  { id: 1, name: 'Created', component: LSP12CreatedAssets },
+  { id: 2, name: 'Vaults', component: LSP10Vault }
 ]
 const login = async () => {
   const router = useRouter()
