@@ -978,7 +978,7 @@
     web3-eth-abi "^1.7.3"
     web3-utils "^1.7.3"
 
-"@erc725/smart-contracts@^3.1.0", "@erc725/smart-contracts@^3.1.1":
+"@erc725/smart-contracts@^3.1.0", "@erc725/smart-contracts@^3.1.2":
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/@erc725/smart-contracts/-/smart-contracts-3.1.2.tgz#7158db178c9787b7ec5c74c8f7d0152e9e11f17f"
   integrity sha512-PvRYl6keiPyqKDEj8hku6FbNBQd0B7YJt6+O6TFIDgEQx0rJvSR5KYf5AoTeihPLOv8zMQPCXfGYvwkma41wug==
@@ -1826,12 +1826,12 @@
     "@openzeppelin/contracts" "^4.6.0"
     solidity-bytes-utils "0.8.0"
 
-"@lukso/lsp-smart-contracts@0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@lukso/lsp-smart-contracts/-/lsp-smart-contracts-0.6.1.tgz#a989759d7aef0f6a59c4a0b9df452657e9e43426"
-  integrity sha512-7R3c6yGrU4P/bsm/xgesmEYpSTIjW2DOiUzEFiJPrM7ADA7wKNwZBzgV2Mm/x2lO3h54lcY0hLKppxm1qQHpGw==
+"@lukso/lsp-smart-contracts@^0.6.2":
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/@lukso/lsp-smart-contracts/-/lsp-smart-contracts-0.6.2.tgz#f19730c4fd8f4c1927e93d1dcb1d2ed275f2fc85"
+  integrity sha512-yEeYJxzpFWI//gl2SFX0fhhRp1Z7jAT/4HWYgaQcROBdjolCTMgRMmGBuSmdPaKBtbYz9qTOAx14LWcMJ5BbFQ==
   dependencies:
-    "@erc725/smart-contracts" "^3.1.1"
+    "@erc725/smart-contracts" "^3.1.2"
     "@openzeppelin/contracts" "^4.6.0"
     solidity-bytes-utils "0.8.0"
 
