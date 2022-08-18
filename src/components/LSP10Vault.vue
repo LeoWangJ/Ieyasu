@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import LSP10ReceivedVaultsSchema from '@erc725/erc725.js/schemas/LSP10ReceivedVaults.json'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import { getEthers } from '@/composables/ethers'
-import { createMyVault } from '@/composables/createEOA'
+import { createMyVault, settingURDAddressInStorage } from '@/composables/createEOA'
 
 const disabled = ref(false)
 onMounted(async () => {
@@ -23,8 +23,13 @@ const getVaults = async () => {
 const createVault = async () => {
   disabled.value = true
   const { account, signer } = await getEthers()
-  const deploy = await createMyVault(account, signer)
-  console.log('deploy:', deploy)
+  // const deployVault = await createMyVault(account, signer)
+  // console.log('deploy:', deployVault)
+  // const deployURD = await createMyVault(account, signer)
+  // console.log('deployURD:', deployURD)
+  const deploySettingURD = await settingURDAddressInStorage(account, signer)
+  // const deploySettingURD = await settingURDAddressInStorage1(account, signer)
+  console.log('deploySettingURD:', deploySettingURD)
   disabled.value = false
 }
 </script>
