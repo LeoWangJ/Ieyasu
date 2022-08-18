@@ -6,10 +6,12 @@ import LSP5ReceivedAssetsSchema from '@erc725/erc725.js/schemas/LSP5ReceivedAsse
 import LSP8IdentifiableDigitalAsset from '@lukso/lsp-smart-contracts/artifacts/LSP8IdentifiableDigitalAsset.json'
 import { getEthers } from '@/composables/ethers'
 import { ethers } from 'ethers'
-import { INTERFACEID, LOCATION } from '@/utils/config'
+import { INTERFACEID, LOCATION, RPC_URLS } from '@/utils/config'
 import TokenAssets from './TokenAssets.vue'
 import NFTAssets from './NFTAssets.vue'
 import type { ReceivedTokens } from '@/utils/types'
+import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
+import KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
 
 const receivedAssets = ref<string[]>([])
 const receivedTokens = ref<ReceivedTokens[]>([])
@@ -45,7 +47,33 @@ onMounted(async () => {
       })
     }
   })
+  // await transferLYX('0x3adEcd65A2Db4F9Cb6e84a6D0DE5d33b8a8B9f89', 3)
 })
+
+const transferLYX = async (recipientAddress:string, sendAmount:number, privateKey:string) => {
+  const { account, signer } = await getEthers()
+  const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
+  const provider = ethers.providers.getDefaultProvider(RPC_URLS.L16)
+  const myEOA = new ethers.Wallet(privateKey, provider)
+  const amount = ethers.utils.parseEther(`${sendAmount}`)
+  console.log('UniversalProfile.abi:', UniversalProfile.abi)
+  console.log(await myUP.isValidSignature())
+  // const transferLYXPayload = await myUP.interface.encodeFunctionData('execute(uint256,address,uint256,bytes)', [0, recipientAddress, amount.toString(), '0x'])
+  const transferLYXPayload = await myUP.execute(0, recipientAddress, amount.toString(), '0x', {
+    gasLimit: 300_000
+  })
+
+  console.log('transferLYXPayload:', transferLYXPayload)
+  // const owner = await myUP.owner()
+  // console.log('owner:', owner)
+  // const myKM = new ethers.Contract(owner, KeyManager.abi, myEOA)
+  // console.log('myKM:', myKM)
+
+  // const t = await myKM.execute(transferLYXPayload, {
+  //   gasLimit: 300_000
+  // })
+  // console.log('t:', t)
+}
 </script>
 
 <template>
