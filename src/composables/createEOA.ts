@@ -6,8 +6,6 @@ import { RPC_URLS, CHAIN_IDS } from '@/utils/config'
 import { ERC725YKeys } from '@lukso/lsp-smart-contracts/constants.js'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import LSP6KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
-import Web3 from 'web3'
-import { AbiItem } from 'web3-utils'
 
 export const createEOA = () => {
   const myEOA = ethers.Wallet.createRandom()
@@ -105,4 +103,31 @@ export const settingURDAddressInStorage = async (account:string, signer:Signer, 
   // await myKM.execute(executePayload, {
   //   gasLimit: 100000000
   // })
+}
+
+export const setAddressPermission = async (account:string, signer:Signer, thirdPartyAddress:string) => {
+  const myVaultAddress = '0x..' // address of the Vault
+
+  // create an instance of the UP
+  const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
+
+  const allowedAddressesDataKey = // constructing the data key of allowed addresses
+    ERC725YKeys.LSP6['AddressPermissions:AllowedAddresses'] +
+    thirdPartyAddress.substring(2) // of the 3rd party
+
+  // the data value holding the addresses that the 3rd party is allowed to interact with
+  const arrayOfAddresses = ethers.utils.defaultAbiCoder.encode(['address'], [myVaultAddress])
+
+  // encode setData payload on the UP
+  const setDataPayload = await myUP['setData(bytes32,bytes)'](allowedAddressesDataKey, arrayOfAddresses)
+  console.log('setDataPayload:', setDataPayload)
+
+  // getting the Key Manager address from UP
+  // const myKeyManagerAddress = await myUP.methods.owner()
+
+  // // create an instance of the KeyManager
+  // const myKM = new ethers.Contract(myKeyManagerAddress, LSP6KeyManager.abi)
+
+  // // execute the setDataPayload on the KM
+  // await myKM.execute(setDataPayload)
 }

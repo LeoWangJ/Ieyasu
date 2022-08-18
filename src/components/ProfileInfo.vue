@@ -45,6 +45,9 @@ info.address = address
 const { copy, copied } = useClipboard({ source: address })
 try {
   const metaData = await profile.fetchData('LSP3Profile')
+  const result = await profile.fetchData('LSP1UniversalReceiverDelegate')
+  console.log('LSP1UniversalReceiverDelegate', result)
+
   info = {
     ...info,
     ...metaData.value?.LSP3Profile
@@ -60,9 +63,9 @@ const copyHandler = () => {
 </script>
 
 <template>
-  <div class="relative w-full mx-auto">
+  <div class="mx-auto w-full relative">
     <van-image
-      class="w-full h-[55vw] sm:(h-300px)"
+      class="h-[55vw] w-full sm:(h-300px)"
       :src="handlerIPFSImg(info.backgroundImage[0]?.url)"/>
     <div class="flex flex-col mt-[8%] text-primary w-full inset-0 absolute items-center">
       <div class="rounded-full mx-auto h-[20vw] w-[20vw] overflow-hidden sm:(w-[129px] h-[129px]) ">
@@ -72,7 +75,7 @@ const copyHandler = () => {
           :src="handlerIPFSImg(info.profileImage[0]?.url)"
           />
       </div>
-      <div class="mt-5 mb-1 text-center text-[white]">
+      <div class="mt-5 text-center text-[white] mb-1">
         <div class="text-shadow-lg">
           {{ `${info.address.slice(0,8)}...${info.address.slice(-6)}` }}
           <van-icon name="link-o" @click="copyHandler" class="cursor-pointer"/>
