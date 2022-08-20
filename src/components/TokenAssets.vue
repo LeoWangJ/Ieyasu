@@ -47,7 +47,6 @@ const getAssets = async () => {
   token.symbol = metadata[1].value as string
   token.icon = handlerIPFSImg(metadata[2].value.LSP4Metadata.icon[0].url)
   const lsp4DigitalAssetContract = new ethers.Contract(props.address, LSP7DigitalAssetSchema.abi, ethereumProvider)
-  console.log('s', lsp4DigitalAssetContract)
   token.balance = ethers.utils.formatEther(await lsp4DigitalAssetContract.balanceOf(account))
 }
 

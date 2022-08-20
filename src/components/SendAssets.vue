@@ -49,14 +49,17 @@ const send = async () => {
     isRecipientEOA.value = true
   }
   try {
-    props.assets.isNFT ? await sendLSP8Token(account, signer) : await sendLSP7Token(account, signer)
-
-    if (localStorage.getItem('receivedAssets')) {
-      const LSP5ReceivedAssets = JSON.parse(localStorage.getItem('receivedAssets'))
-      LSP5ReceivedAssets.value = LSP5ReceivedAssets.value.filter(function (assetAddress: string) {
-        return assetAddress !== props.assets.address
-      })
-      localStorage.setItem('receivedAssets', JSON.stringify(LSP5ReceivedAssets))
+    if (props.assets.isNFT) {
+      await sendLSP8Token(account, signer)
+      if (localStorage.getItem('receivedAssets')) {
+        const LSP5ReceivedAssets = JSON.parse(localStorage.getItem('receivedAssets') as string)
+        LSP5ReceivedAssets.value = LSP5ReceivedAssets.value.filter(function (assetAddress: string) {
+          return assetAddress !== props.assets.address
+        })
+        localStorage.setItem('receivedAssets', JSON.stringify(LSP5ReceivedAssets))
+      }
+    } else {
+      await sendLSP7Token(account, signer)
     }
   } catch (err: Error) {
     error.value = err.message

@@ -24,6 +24,8 @@ onMounted(async () => {
     receivedAssets.value = LSP5ReceivedAssets.value as string[]
   } catch (e) {
     // TODO EOA
+    const LSP5ReceivedAssets = JSON.parse(localStorage.getItem('receivedAssets') as string)
+    receivedAssets.value = LSP5ReceivedAssets.value
   }
   receivedAssets.value.forEach(async (address) => {
     const LSP8IdentifiableDigitalAssetContract = new ethers.Contract(address, LSP8IdentifiableDigitalAsset.abi, ethereumProvider)

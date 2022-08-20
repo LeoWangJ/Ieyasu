@@ -6,6 +6,7 @@ import { getEthers } from '@/composables/ethers'
 import { createMyVault, settingURDAddressInStorage } from '@/composables/createEOA'
 
 const disabled = ref(false)
+const vaults = ref([])
 onMounted(async () => {
   await getVaults()
 })
@@ -14,10 +15,15 @@ const getVaults = async () => {
   const { provider, account } = await getEthers()
   const controller = new ERC725(LSP10ReceivedVaultsSchema as ERC725JSONSchema[], account, provider)
   console.log('controller:', controller)
-  const metaData = await controller.fetchData([
-    'LSP10Vaults[]'
-  ])
-  console.log('metaData:', metaData)
+  try {
+    const metaData = await controller.fetchData([
+      'LSP10Vaults[]'
+    ])
+
+    console.log('metaData:', metaData)
+  } catch (e) {
+
+  }
 }
 
 const createVault = async () => {

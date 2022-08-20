@@ -18,10 +18,14 @@ onMounted(async () => {
   const controller = new ERC725(LSP12IssuedAssetsSchema as ERC725JSONSchema[], account, provider, {
     ipfsGateway: IPFS_GATEWAY_BASE_URL
   })
-  const LSP12IssuedAssets = await controller.getData('LSP12IssuedAssets[]')
-  console.log('LSP12IssuedAssets:', LSP12IssuedAssets.length)
+  try {
+    const LSP12IssuedAssets = await controller.getData('LSP12IssuedAssets[]')
+    receivedAssets.value = LSP12IssuedAssets.value as string[]
+  } catch (e) {
+    const LSP12IssuedAssets = JSON.parse(localStorage.getItem('issuedAssets') as string)
+    receivedAssets.value = LSP12IssuedAssets.value as string[]
+  }
 
-  receivedAssets.value = LSP12IssuedAssets.value as string[]
   receivedAssets.value.forEach(async (address) => {
     const supportsInterface = new ethers.Contract(address, [COMMON_ABIS.supportsInterface], ethereumProvider)
 

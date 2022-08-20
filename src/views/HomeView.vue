@@ -8,8 +8,8 @@ import { useRouter } from 'vue-router'
 import { Toast, Tab, Tabs } from 'vant'
 import { getEthers } from '@/composables/ethers'
 import 'vant/es/toast/style'
-onMounted(() => {
-  login()
+onMounted(async () => {
+  await login()
 })
 const active = ref(0)
 const tabs = [
@@ -20,14 +20,40 @@ const tabs = [
 const login = async () => {
   const router = useRouter()
   try {
-    const { account } = await getEthers()
+    const { account, isEOAccount } = await getEthers()
     if (!account) {
       throw Error('No accounts')
     }
-    console.log(account)
+    if (isEOAccount) {
+      setupLocalStorage('receivedAssets', account)
+      setupLocalStorage('issuedAssets', account)
+      setupLocalStorage('vaults', account)
+    } else {
+      clearLocalStorage('receivedAssets')
+      clearLocalStorage('issuedAssets')
+      // clearLocalStorage('vaults')
+    }
   } catch (e) {
     Toast.fail('Not Login')
     router.push('/login')
+  }
+}
+
+const setupLocalStorage = (itemName:string, account:string) => {
+  if (localStorage.getItem(itemName) === null) {
+    localStorage.setItem(itemName, JSON.stringify({ value: [], account: account }))
+  } else {
+    const localStorageOwner = JSON.parse(localStorage.getItem(itemName) as string)
+
+    if (localStorageOwner.account !== account) {
+      localStorage.removeItem(itemName)
+    }
+  }
+}
+
+const clearLocalStorage = (itemName:string) => {
+  if (localStorage.getItem(itemName) !== null) {
+    localStorage.removeItem(itemName)
   }
 }
 </script>

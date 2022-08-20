@@ -51,7 +51,7 @@ const mint = async () => {
     const receipt = await LSP7DigitalAssetContract.mint(account, amount.toString(), isMinterEOA.value, '0x')
     txHash.value = receipt.hash
     if (isEOAccount) {
-      const LSP5ReceivedAssets = JSON.parse(localStorage.getItem('receivedAssets'))
+      const LSP5ReceivedAssets = JSON.parse(localStorage.getItem('receivedAssets') as string)
 
       if (LSP5ReceivedAssets.value.indexOf(props.assets.address) === -1) {
         LSP5ReceivedAssets.value.push(props.assets.address)

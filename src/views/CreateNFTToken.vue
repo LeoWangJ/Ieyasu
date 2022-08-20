@@ -128,7 +128,7 @@ const transaction = async (deployedAssetAddress: string) => {
     console.log('profileContract:', profileContract)
 
     const receipt = await profileContract['setData(bytes32[],bytes[])'](encodedErc725Data.keys, encodedErc725Data.values, {
-      gasLimit: 100000000
+      gasLimit: 300_0000
     })
     console.log('receipt:', receipt)
     step.value = 2
