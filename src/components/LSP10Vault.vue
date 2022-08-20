@@ -3,46 +3,114 @@ import { onMounted, ref } from 'vue'
 import LSP10ReceivedVaultsSchema from '@erc725/erc725.js/schemas/LSP10ReceivedVaults.json'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import { getEthers } from '@/composables/ethers'
-import { createMyVault, settingURDAddressInStorage } from '@/composables/createEOA'
+import { settingURDAddressInStorage } from '@/composables/createEOA'
+import { Dialog, Toast } from 'vant'
+import { useClipboard } from '@vueuse/core'
+import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
+import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 
 const disabled = ref(false)
-const vaults = ref([])
+const error = ref('')
+const step = ref(0)
+const txHash = ref('')
+const vaults = ref<string[]>([])
+const address = ref('')
+const isL16Network = ref(true)
+const showCreateVault = ref(false)
+const DialogComponent = Dialog.Component
+
+const { copy, copied } = useClipboard({ source: address })
+
 onMounted(async () => {
   await getVaults()
 })
 
+const checkNetwork = async () => {
+  isL16Network.value = await isLuksoNetwork()
+}
+
 const getVaults = async () => {
-  const { provider, account } = await getEthers()
-  const controller = new ERC725(LSP10ReceivedVaultsSchema as ERC725JSONSchema[], account, provider)
-  console.log('controller:', controller)
-  try {
-    const metaData = await controller.fetchData([
-      'LSP10Vaults[]'
-    ])
+  const LSP10Vaults = JSON.parse(localStorage.getItem('vaults') as string)
+  console.log('LSP10Vaults:', JSON.parse(localStorage.getItem('vaults') as string))
 
-    console.log('metaData:', metaData)
-  } catch (e) {
-
-  }
+  vaults.value = LSP10Vaults.value
+  // TODO: LSP10Vaults always empty..
+  // const { provider, account } = await getEthers()
+  // const controller = new ERC725(LSP10ReceivedVaultsSchema as ERC725JSONSchema[], account, provider)
+  // try {
+  //   const LSP10Vaults = await controller.fetchData([
+  //     'LSP10Vaults[]'
+  //   ])
+  //   vaults.value = LSP10Vaults[0].value
+  // } catch (e) {
+  //   const LSP10Vaults = JSON.parse(localStorage.getItem('vaults') as string)
+  //   vaults.value = LSP10Vaults.value
+  // }
+  console.log('LSP10Vaults:', vaults.value)
 }
 
 const createVault = async () => {
   disabled.value = true
+  showCreateVault.value = true
   const { account, signer } = await getEthers()
-  // const deployVault = await createMyVault(account, signer)
-  // console.log('deploy:', deployVault)
-  // const deployURD = await createMyVault(account, signer)
-  // console.log('deployURD:', deployURD)
-  const deploySettingURD = await settingURDAddressInStorage(account, signer)
-  // const deploySettingURD = await settingURDAddressInStorage1(account, signer)
-  console.log('deploySettingURD:', deploySettingURD)
+  try {
+    const recipient = await settingURDAddressInStorage(account, signer)
+    if (localStorage.getItem('vaults')) {
+      const LSP9Vaults = JSON.parse(localStorage.getItem('vaults') as string)
+      LSP9Vaults.value = [...LSP9Vaults.value, recipient.address]
+      localStorage.setItem('vaults', JSON.stringify(LSP9Vaults))
+    }
+    step.value = 1
+    txHash.value = recipient.hash
+  } catch (err:Error) {
+    console.log(err)
+    error.value = err
+  }
   disabled.value = false
+}
+const copyHandler = (vaultAddress:string) => {
+  address.value = vaultAddress
+  copy()
+  if (copied) return Toast.success('copied!')
+}
+
+const clickNavBar = () => {
+  if (step.value === 1) {
+    disabled.value = false
+    step.value = 0
+    error.value = ''
+    txHash.value = ''
+    getVaults()
+  }
+  error.value = ''
+  showCreateVault.value = false
 }
 </script>
 
 <template>
-  <div>
-    <van-button type="primary" @click="createVault" :disabled="disabled">Create Own Vault</van-button>
-
+  <van-button type="primary" @click="createVault" :disabled="disabled">Create Own Vault</van-button>
+  <div v-for="vault in vaults" :key="vault">
+    <div class="text-shadow-lg">
+      {{ `${vault.slice(0,8)}...${vault.slice(-6)}` }}
+      <van-icon name="link-o" @click="copyHandler(vault)" class="cursor-pointer"/>
+    </div>
   </div>
+
+  <DialogComponent v-model:show="showCreateVault" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
+    class="h-full max-w-screen-md !bg-primary !rounded-none">
+    <van-nav-bar title="Create Own Vault" left-arrow @click-left="clickNavBar" />
+    <van-steps :active="step" active-icon="success" active-color="#38f">
+      <van-step>Creating</van-step>
+      <van-step>🎉 Success</van-step>
+    </van-steps>
+    <div v-if="step == 0">
+      Need three times transactions , please be patient!
+    </div>
+    <div v-if="step == 1">
+     🎉 Success: tx hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${txHash}`" target="_blank">{{
+          txHash
+      }}</a>
+    </div>
+    <p v-if="error" class="text-[red]">{{ error }}</p>
+  </DialogComponent>
 </template>

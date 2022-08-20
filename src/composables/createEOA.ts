@@ -37,72 +37,60 @@ export const createUP = async (privateKey:string) => {
 }
 export const createURD = async (address:string, signer:Signer) => {
   const myURDVault = new ethers.ContractFactory(LSP1UniversalReceiverDelegateVault.abi, LSP1UniversalReceiverDelegateVault.bytecode, signer)
-
   // deploy the universal receiver delegate Vault contract
-  const contract = await myURDVault.deploy(address, { gasLimit: 1000000 })
+  const contract = await myURDVault.deploy({ gasLimit: 1000000 })
   try {
-    return await contract.deployed()
+    const transaction = await contract.deployTransaction.wait()
+    return { ...contract, contractAddress: transaction.contractAddress }
   } catch (error:any) {
     console.log('Failed to deploy in TX:', error.transactionHash)
     throw error
   }
 }
-
 export const createMyVault = async (address:string, signer:Signer) => {
   const myVault = new ethers.ContractFactory(LSP9Vault.abi, LSP9Vault.bytecode, signer)
-  const contract = await myVault.deploy(address, { gasLimit: 1000000 })
+
   try {
-    return await contract.deployed()
+    const contract = await myVault.deploy(address, { gasLimit: 1000000 })
+    const transaction = await contract.deployTransaction.wait()
+    return { ...contract, contractAddress: transaction.contractAddress }
   } catch (error:any) {
     console.log('Failed to deploy in TX:', error.transactionHash)
     throw error
   }
 }
 
-export const settingURDAddressInStorage = async (account:string, signer:Signer, myVaultAddress:string, myURDAddress:string) => {
+export const settingURDAddressInStorage = async (account:string, signer:Signer) => {
   const URD_DATA_KEY = ERC725YKeys.LSP0.LSP1UniversalReceiverDelegate
-  // address of the UP
-  // address of the Vault
-  // address of the URD of the Vault
-  const deployVault = await createMyVault(account, signer)
-  console.log('deploy:', deployVault)
-  const deployURD = await createMyVault(account, signer)
-  console.log('deployURD:', deployURD)
-  // create an instance of the Vault
-  const myLSP9Vault = new ethers.ContractFactory(LSP9Vault.abi, LSP9Vault.bytecode, deployVault.signer)
 
-  // create an instance of the UP
   const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
-  console.log('deployURD.address:', deployURD.address)
-  const abi = ethers.utils.defaultAbiCoder
+  const deployVault:any = await createMyVault(account, signer)
 
-  // encode setData Payload on the Vault
-  const setDataPayload = await deployVault[
-    'setData(bytes32,bytes)'
-  ](URD_DATA_KEY, deployURD.address)
-  // const setDataPayload = await deployVault.interface.encodeFunctionData('setData(bytes32,bytes)', [URD_DATA_KEY, deployURD.address]) // Any other information can be stored here
-  // console.log(abi.encode(['bytes'], [setDataPayload]))
-  console.log('setDataPayload:', setDataPayload)
-  // encode execute Payload on the UP
-  // const executePayload = await myUP.execute(
-  //   0, // OPERATION CALL
-  //   deployVault.address,
-  //   0, // value to transfer
-  //   setDataPayload, {
-  //     gasLimit: 300_0000
-  //   }
-  // )
-  // console.log('executePayload:', executePayload)
-  // // getting the Key Manager address from UP
-  // const myKeyManagerAddress = await myUP.owner()
+  console.log('deploy:', deployVault)
+  const deployURD = await createURD(account, signer)
+  console.log('deployURD:', deployURD)
 
-  // // create an instance of the KeyManager
-  // const myKM = new ethers.Contract(myKeyManagerAddress, LSP6KeyManager.abi, signer)
+  const recipient = await deployVault['setData(bytes32,bytes)'](URD_DATA_KEY, deployURD.contractAddress, {
+    gasLimit: 300_0000
+  }) // Any other information can be stored here
 
-  // // execute the executePayload on the KM
-  // await myKM.execute(executePayload, {
+  // const executePayload = await myUP.interface.encodeFunctionData('execute(uint256,address,uint256,bytes)', [0, deployVault.contractAddress, 0, setDataPayload])
+  // const tx = await myUP.execute(0, deployVault.contractAddress, 0, setDataPayload, {
   //   gasLimit: 300_0000
   // })
+  // console.log(tx)
+  // const myKeyManagerAddress = await myUP.owner()
+  // const provider = ethers.providers.getDefaultProvider(RPC_URLS.L16)
+  // const myEOA = new ethers.Wallet('0x55c4e7d54bba3420010488372d6dac776f79074883c22ceba55611421a1715f1', provider)
+
+  // // create an instance of the KeyManager
+  // const myKM = new ethers.Contract(myKeyManagerAddress, LSP6KeyManager.abi, myEOA)
+
+  // // execute the executePayload on the KM
+  // return await myKM.execute(executePayload, {
+  //   gasLimit: 300_0000
+  // })
+  return { hash: recipient.hash, address: deployVault.contractAddress }
 }
 
 export const setAddressPermission = async (account:string, signer:Signer, thirdPartyAddress:string) => {

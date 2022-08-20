@@ -23,18 +23,21 @@ const DialogComponent = Dialog.Component
 
 onMounted(async () => {
   await getReceivedAssets()
-  // await transferLYX('0x3adEcd65A2Db4F9Cb6e84a6D0DE5d33b8a8B9f89', 3)
+  // await transferLYX('0xCBC7c079c4042A6FD7495e7Ab1b8DD9ed39E4F9C', 50)
 })
 const getReceivedAssets = async () => {
   receivedAssets.value = []
   receivedTokens.value = []
   receivedNFTTokens.value = []
-  const { provider, account, ethereumProvider } = await getEthers()
+  let { provider, account, ethereumProvider } = await getEthers()
+  account = '0x18Fb750909f45f0C9629F4Af8fa506fb3D158eE3'
   const controller = new ERC725js(LSP5ReceivedAssetsSchema as ERC725JSONSchema[], account, provider)
   try {
     const LSP5ReceivedAssets = await controller.getData('LSP5ReceivedAssets[]')
+    console.log('LSP5ReceivedAssets:', LSP5ReceivedAssets)
     receivedAssets.value = LSP5ReceivedAssets.value as string[]
   } catch (e) {
+    console.log(e)
     const LSP5ReceivedAssets = JSON.parse(localStorage.getItem('receivedAssets') as string)
     receivedAssets.value = LSP5ReceivedAssets.value
   }
@@ -42,7 +45,7 @@ const getReceivedAssets = async () => {
   const LSP5LegacyAssets = JSON.parse(localStorage.getItem('legacyAssets') as string)
   console.log('LSP5LegacyAssets', LSP5LegacyAssets)
 
-  if (LSP5LegacyAssets.value.length) {
+  if (LSP5LegacyAssets) {
     const contactArr = [...receivedAssets.value, ...LSP5LegacyAssets.value]
     receivedAssets.value = [...new Set(contactArr)]
   }
@@ -71,20 +74,26 @@ const getReceivedAssets = async () => {
     }
   })
 }
-const transferLYX = async (recipientAddress:string, sendAmount:number, privateKey:string) => {
+const transferLYX = async (recipientAddress:string, sendAmount:number) => {
   const { account, signer } = await getEthers()
-  const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
-  const provider = ethers.providers.getDefaultProvider(RPC_URLS.L16)
-  const myEOA = new ethers.Wallet(privateKey, provider)
+  // const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
+  // const provider = ethers.providers.getDefaultProvider(RPC_URLS.L16)
+  // const myEOA = new ethers.Wallet(privateKey, provider)
   const amount = ethers.utils.parseEther(`${sendAmount}`)
   console.log('UniversalProfile.abi:', UniversalProfile.abi)
-  console.log(await myUP.isValidSignature())
+  // ssconsole.log(await myUP.isValidSignature())
   // const transferLYXPayload = await myUP.interface.encodeFunctionData('execute(uint256,address,uint256,bytes)', [0, recipientAddress, amount.toString(), '0x'])
-  const transferLYXPayload = await myUP.execute(0, recipientAddress, amount.toString(), '0x', {
-    gasLimit: 300_000
+  // const transferLYXPayload = await myUP.execute(0, recipientAddress, amount.toString(), '0x', {
+  //   gasLimit: 300_000
+  // })
+  await signer.sendTransaction({
+    from: account,
+    to: recipientAddress,
+    value: amount,
+    gasLimit: 300_000,
+    gasPrice: '1000000000'
   })
-
-  console.log('transferLYXPayload:', transferLYXPayload)
+  // console.log('transferLYXPayload:', transferLYXPayload)
   // const owner = await myUP.owner()
   // console.log('owner:', owner)
   // const myKM = new ethers.Contract(owner, KeyManager.abi, myEOA)
@@ -106,13 +115,13 @@ const closeLegacy = async () => {
 <template>
   <van-button type="primary" @click="showLegacy = true">Find Legacy Assets</van-button>
 
-  <p class="m-2">TOKENs</p>
+  <!-- <p class="m-2">TOKENs</p>
   <TokenAssets
     :location="LOCATION.received"
     :address="item.address"
     v-for="(item,index) in receivedTokens"
     :key="index">
-  </TokenAssets>
+  </TokenAssets> -->
   <div v-if="receivedTokens.length">
     <p class="m-2">TOKENs</p>
     <TokenAssets

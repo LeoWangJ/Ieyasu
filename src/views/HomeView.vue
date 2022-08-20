@@ -26,13 +26,13 @@ const login = async () => {
     }
 
     setupLocalStorage('legacyAssets', account)
+    setupLocalStorage('vaults', account)
     if (isEOAccount) {
       setupLocalStorage('receivedAssets', account)
       setupLocalStorage('issuedAssets', account)
-      setupLocalStorage('vaults', account)
     } else {
-      clearLocalStorage('receivedAssets')
-      clearLocalStorage('issuedAssets')
+      // clearLocalStorage('receivedAssets')
+      // clearLocalStorage('issuedAssets')
       // clearLocalStorage('vaults')
     }
   } catch (e) {

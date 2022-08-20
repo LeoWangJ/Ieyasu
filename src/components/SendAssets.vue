@@ -62,6 +62,7 @@ const send = async () => {
       await sendLSP7Token(account, signer)
     }
   } catch (err: Error) {
+    console.log(err)
     error.value = err.message
     disabled.value = false
     return
@@ -74,14 +75,18 @@ const send = async () => {
 const sendLSP7Token = async (fromAddress: string, signer: Signer) => {
   const controller = new ethers.Contract(props.assets.address, LSP7DigitalAsset.abi, signer)
   const amount = ethers.utils.parseEther(`${sendAmount.value}`)
-  const receipt = await controller.transfer(fromAddress, recipientAddress.value, amount, isRecipientEOA.value, '0x')
+  const receipt = await controller.transfer(fromAddress, recipientAddress.value, amount, isRecipientEOA.value, '0x', {
+    gasLimit: 300_0000
+  })
   txHash.value = receipt.hash
 }
 
 const sendLSP8Token = async (fromAddress: string, signer: Signer) => {
   const controller = new ethers.Contract(props.assets.address, LSP8IdentifiableDigitalAsset.abi, signer)
 
-  const receipt = await controller.transfer(fromAddress, recipientAddress.value, props.assets.tokenId, isRecipientEOA.value, '0x')
+  const receipt = await controller.transfer(fromAddress, recipientAddress.value, props.assets.tokenId, isRecipientEOA.value, '0x', {
+    gasLimit: 300_0000
+  })
   txHash.value = receipt.hash
 }
 
