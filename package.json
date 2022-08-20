@@ -1,11 +1,15 @@
 {
   "name": "leyasu",
+  "homepage": "https://leowangj.github.io/leyasu",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "deploy": "gh-pages -d dist",
+    "predeploy": "vue-cli-service build"
+
   },
   "dependencies": {
     "@erc725/erc725.js": "^0.14.4",
@@ -16,6 +20,7 @@
     "ethers": "^5.6.9",
     "vant": "^3.5.3",
     "vue": "^3.2.13",
+    "gh-pages": "^4.0.0",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.0"
   },
