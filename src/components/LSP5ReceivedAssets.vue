@@ -12,21 +12,42 @@ import NFTAssets from './NFTAssets.vue'
 import type { ReceivedTokens } from '@/utils/types'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
+import { Dialog } from 'vant'
+import LegacyLSPAssets from './LegacyLSPAssets.vue'
 
 const receivedAssets = ref<string[]>([])
 const receivedTokens = ref<ReceivedTokens[]>([])
 const receivedNFTTokens = ref<ReceivedTokens[]>([])
+const showLegacy = ref(false)
+const DialogComponent = Dialog.Component
+
 onMounted(async () => {
+  await getReceivedAssets()
+  // await transferLYX('0x3adEcd65A2Db4F9Cb6e84a6D0DE5d33b8a8B9f89', 3)
+})
+const getReceivedAssets = async () => {
+  receivedAssets.value = []
+  receivedTokens.value = []
+  receivedNFTTokens.value = []
   const { provider, account, ethereumProvider } = await getEthers()
   const controller = new ERC725js(LSP5ReceivedAssetsSchema as ERC725JSONSchema[], account, provider)
   try {
     const LSP5ReceivedAssets = await controller.getData('LSP5ReceivedAssets[]')
     receivedAssets.value = LSP5ReceivedAssets.value as string[]
   } catch (e) {
-    // TODO EOA
     const LSP5ReceivedAssets = JSON.parse(localStorage.getItem('receivedAssets') as string)
     receivedAssets.value = LSP5ReceivedAssets.value
   }
+
+  const LSP5LegacyAssets = JSON.parse(localStorage.getItem('legacyAssets') as string)
+  console.log('LSP5LegacyAssets', LSP5LegacyAssets)
+
+  if (LSP5LegacyAssets.value.length) {
+    const contactArr = [...receivedAssets.value, ...LSP5LegacyAssets.value]
+    receivedAssets.value = [...new Set(contactArr)]
+  }
+  console.log('receivedAssets:', receivedAssets)
+
   receivedAssets.value.forEach(async (address) => {
     const LSP8IdentifiableDigitalAssetContract = new ethers.Contract(address, LSP8IdentifiableDigitalAsset.abi, ethereumProvider)
 
@@ -49,9 +70,7 @@ onMounted(async () => {
       })
     }
   })
-  // await transferLYX('0x3adEcd65A2Db4F9Cb6e84a6D0DE5d33b8a8B9f89', 3)
-})
-
+}
 const transferLYX = async (recipientAddress:string, sendAmount:number, privateKey:string) => {
   const { account, signer } = await getEthers()
   const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
@@ -76,9 +95,24 @@ const transferLYX = async (recipientAddress:string, sendAmount:number, privateKe
   // })
   // console.log('t:', t)
 }
+
+const closeLegacy = async () => {
+  await getReceivedAssets()
+
+  showLegacy.value = false
+}
 </script>
 
 <template>
+  <van-button type="primary" @click="showLegacy = true">Find Legacy Assets</van-button>
+
+  <p class="m-2">TOKENs</p>
+  <TokenAssets
+    :location="LOCATION.received"
+    :address="item.address"
+    v-for="(item,index) in receivedTokens"
+    :key="index">
+  </TokenAssets>
   <div v-if="receivedTokens.length">
     <p class="m-2">TOKENs</p>
     <TokenAssets
@@ -98,4 +132,8 @@ const transferLYX = async (recipientAddress:string, sendAmount:number, privateKe
       :key="index">
     </NFTAssets>
   </div>
+  <DialogComponent v-model:show="showLegacy" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
+    class="h-full max-w-screen-md !bg-primary !rounded-none">
+    <LegacyLSPAssets @close="closeLegacy"></LegacyLSPAssets>
+  </DialogComponent>
 </template>

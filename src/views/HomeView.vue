@@ -24,6 +24,8 @@ const login = async () => {
     if (!account) {
       throw Error('No accounts')
     }
+
+    setupLocalStorage('legacyAssets', account)
     if (isEOAccount) {
       setupLocalStorage('receivedAssets', account)
       setupLocalStorage('issuedAssets', account)
