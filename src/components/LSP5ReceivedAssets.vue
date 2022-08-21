@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import ERC725js from '@erc725/erc725.js'
 import type { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP5ReceivedAssetsSchema from '@erc725/erc725.js/schemas/LSP5ReceivedAssets.json'
 import LSP8IdentifiableDigitalAsset from '@lukso/lsp-smart-contracts/artifacts/LSP8IdentifiableDigitalAsset.json'
-import { getEthers } from '@/composables/ethers'
+import { getEthers, useAddress } from '@/composables/ethers'
 import { ethers } from 'ethers'
 import { INTERFACEID, LOCATION, RPC_URLS } from '@/utils/config'
 import TokenAssets from './TokenAssets.vue'
@@ -14,27 +14,35 @@ import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProf
 import KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
 import { Dialog } from 'vant'
 import LegacyLSPAssets from './LegacyLSPAssets.vue'
+import { useStore } from 'vuex'
+const store = useStore()
 
+const { provider, ethereumProvider } = await getEthers()
 const receivedAssets = ref<string[]>([])
 const receivedTokens = ref<ReceivedTokens[]>([])
 const receivedNFTTokens = ref<ReceivedTokens[]>([])
 const showLegacy = ref(false)
 const DialogComponent = Dialog.Component
-
 onMounted(async () => {
-  await getReceivedAssets()
+  if (store.state.currentAddress) {
+    await getReceivedAssets()
+  }
   // await transferLYX('0xCBC7c079c4042A6FD7495e7Ab1b8DD9ed39E4F9C', 50)
+})
+const address = computed(() => store.state.currentAddress)
+watch([address], async (now, prev) => {
+  if (now !== prev) {
+    await getReceivedAssets()
+  }
 })
 const getReceivedAssets = async () => {
   receivedAssets.value = []
   receivedTokens.value = []
   receivedNFTTokens.value = []
-  let { provider, account, ethereumProvider } = await getEthers()
-  account = '0x18Fb750909f45f0C9629F4Af8fa506fb3D158eE3'
+  const account = store.state.currentAddress
   const controller = new ERC725js(LSP5ReceivedAssetsSchema as ERC725JSONSchema[], account, provider)
   try {
     const LSP5ReceivedAssets = await controller.getData('LSP5ReceivedAssets[]')
-    console.log('LSP5ReceivedAssets:', LSP5ReceivedAssets)
     receivedAssets.value = LSP5ReceivedAssets.value as string[]
   } catch (e) {
     console.log(e)
@@ -43,13 +51,11 @@ const getReceivedAssets = async () => {
   }
 
   const LSP5LegacyAssets = JSON.parse(localStorage.getItem('legacyAssets') as string)
-  console.log('LSP5LegacyAssets', LSP5LegacyAssets)
 
   if (LSP5LegacyAssets) {
     const contactArr = [...receivedAssets.value, ...LSP5LegacyAssets.value]
     receivedAssets.value = [...new Set(contactArr)]
   }
-  console.log('receivedAssets:', receivedAssets)
 
   receivedAssets.value.forEach(async (address) => {
     const LSP8IdentifiableDigitalAssetContract = new ethers.Contract(address, LSP8IdentifiableDigitalAsset.abi, ethereumProvider)
@@ -80,7 +86,6 @@ const transferLYX = async (recipientAddress:string, sendAmount:number) => {
   // const provider = ethers.providers.getDefaultProvider(RPC_URLS.L16)
   // const myEOA = new ethers.Wallet(privateKey, provider)
   const amount = ethers.utils.parseEther(`${sendAmount}`)
-  console.log('UniversalProfile.abi:', UniversalProfile.abi)
   // ssconsole.log(await myUP.isValidSignature())
   // const transferLYXPayload = await myUP.interface.encodeFunctionData('execute(uint256,address,uint256,bytes)', [0, recipientAddress, amount.toString(), '0x'])
   // const transferLYXPayload = await myUP.execute(0, recipientAddress, amount.toString(), '0x', {
@@ -110,11 +115,15 @@ const closeLegacy = async () => {
 
   showLegacy.value = false
 }
+
+const select = () => {
+  store.commit('switchAddress', '0x5f5661484C87680a41F2300D00E4ec616c2603d8')
+}
 </script>
 
 <template>
   <van-button type="primary" @click="showLegacy = true">Find Legacy Assets</van-button>
-
+  <van-button type="primary" @click="select">Switch Vault Assets</van-button>
   <!-- <p class="m-2">TOKENs</p>
   <TokenAssets
     :location="LOCATION.received"

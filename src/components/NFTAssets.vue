@@ -13,6 +13,8 @@ import SendAssets from './SendAssets.vue'
 import { NFT } from '@/utils/types'
 import { ethers } from 'ethers'
 import type { Component } from 'vue'
+import { useStore } from 'vuex'
+const store = useStore()
 
 const DialogComponent = Dialog.Component
 const props = defineProps<{
@@ -38,11 +40,11 @@ const showDialog = ref(false)
 const component: Component = shallowRef(undefined)
 
 const getAssets = async () => {
-  const { provider, ethereumProvider, account } = await getEthers()
+  const { provider, ethereumProvider } = await getEthers()
+  const account = store.state.currentAddress
   const controller = new ERC725js([...LSP4DigitalAssetSchema, LSP8MetadataJSONSchema] as ERC725JSONSchema[], props.address, provider, {
     ipfsGateway: IPFS_GATEWAY_BASE_URL
   })
-  console.log('controller:', controller)
 
   const metadata = await controller.fetchData([
     'LSP4TokenName',
@@ -55,7 +57,6 @@ const getAssets = async () => {
       : 'LSP4Metadata',
     'LSP4Metadata'
   ])
-  console.log(metadata)
   nft.name = metadata[0].value as string
   nft.symbol = metadata[1].value as string
   try {

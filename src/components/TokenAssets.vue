@@ -13,6 +13,9 @@ import { ethers } from 'ethers'
 import MintToken from './MintToken.vue'
 import SendAssets from './SendAssets.vue'
 import { NFT } from '@/utils/types'
+import { useStore } from 'vuex'
+const store = useStore()
+
 const props = defineProps<{
   address: string,
   location: string
@@ -34,7 +37,8 @@ const token = reactive<NFT>({
 const showDialog = ref(false)
 const component:Component = shallowRef(undefined)
 const getAssets = async () => {
-  const { provider, ethereumProvider, account } = await getEthers()
+  const { provider, ethereumProvider } = await getEthers()
+  const account = store.state.currentAddress
   const controller = new ERC725js(LSP4DigitalAssetSchema as ERC725JSONSchema[], props.address, provider, {
     ipfsGateway: IPFS_GATEWAY_BASE_URL
   })

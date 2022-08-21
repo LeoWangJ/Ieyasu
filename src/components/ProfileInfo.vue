@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ethers } from 'ethers'
 import { ERC725 } from '@erc725/erc725.js'
 import type { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP3UniversalProfileMetaDataSchema from '@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json'
@@ -8,10 +7,11 @@ import { IPFS_GATEWAY_BASE_URL } from '../utils/config'
 import { Tag, Toast } from 'vant'
 import { useClipboard } from '@vueuse/core'
 import { handlerIPFSImg } from '@/utils'
-const ethereumProvider = new ethers.providers.Web3Provider(window.ethereum)
-const accounts = await ethereumProvider.listAccounts()
-const address = accounts[0]
-const profile = new ERC725(LSP3UniversalProfileMetaDataSchema as ERC725JSONSchema[], address, ethereumProvider.provider, {
+import { getEthers, useAddress } from '@/composables/ethers'
+
+const { account, provider } = await getEthers()
+const address = account
+const profile = new ERC725(LSP3UniversalProfileMetaDataSchema as ERC725JSONSchema[], address, provider, {
   ipfsGateway: IPFS_GATEWAY_BASE_URL // todo the gateway should be without /ipfs/
 })
 interface Image {

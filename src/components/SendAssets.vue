@@ -4,10 +4,15 @@ import LSP8IdentifiableDigitalAsset from '@lukso/lsp-smart-contracts/artifacts/L
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { NFT } from '@/utils/types'
 import { onMounted, ref } from 'vue'
-import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
+import { BLOCKCHAIN_EXPLORER_BASE_URL, RPC_URLS } from '@/utils/config'
 import { getEthers } from '@/composables/ethers'
 import { ethers, Signer } from 'ethers'
 import { Toast } from 'vant'
+import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
+import LSP6KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
+
+import { useStore } from 'vuex'
+const store = useStore()
 
 const props = defineProps<{
   show: boolean,
@@ -36,7 +41,8 @@ const send = async () => {
   step.value = 1
   error.value = ''
   disabled.value = true
-  const { ethereumProvider, account, signer } = await getEthers()
+  const { ethereumProvider, signer } = await getEthers()
+  const account = store.state.currentAddress
   const isAddress = ethers.utils.isAddress(recipientAddress.value)
   if (!isAddress) {
     error.value = 'Recipient Address is not valid'
@@ -75,10 +81,21 @@ const send = async () => {
 const sendLSP7Token = async (fromAddress: string, signer: Signer) => {
   const controller = new ethers.Contract(props.assets.address, LSP7DigitalAsset.abi, signer)
   const amount = ethers.utils.parseEther(`${sendAmount.value}`)
-  const receipt = await controller.transfer(fromAddress, recipientAddress.value, amount, isRecipientEOA.value, '0x', {
-    gasLimit: 300_0000
-  })
-  txHash.value = receipt.hash
+  const { account } = await getEthers()
+
+  if (store.state.isVault) {
+    // TODO
+    const executePayloadVault = await controller.interface.encodeFunctionData('transfer(address,address,uint256,bool,bytes)', [fromAddress, recipientAddress.value, amount, isRecipientEOA.value, '0x'])
+    const receipt = await controller.transfer(fromAddress, recipientAddress.value, amount, isRecipientEOA.value, '0x', {
+      gasLimit: 300_0000
+    })
+    txHash.value = receipt.hash
+  } else {
+    const receipt = await controller.transfer(fromAddress, recipientAddress.value, amount, isRecipientEOA.value, '0x', {
+      gasLimit: 300_0000
+    })
+    txHash.value = receipt.hash
+  }
 }
 
 const sendLSP8Token = async (fromAddress: string, signer: Signer) => {

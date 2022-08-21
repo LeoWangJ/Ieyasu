@@ -8,6 +8,7 @@ import { useRouter } from 'vue-router'
 import { Toast, Tab, Tabs } from 'vant'
 import { getEthers } from '@/composables/ethers'
 import 'vant/es/toast/style'
+import store from '@/store'
 onMounted(async () => {
   await login()
 })
@@ -24,7 +25,7 @@ const login = async () => {
     if (!account) {
       throw Error('No accounts')
     }
-
+    await store.dispatch('initAddress', account)
     setupLocalStorage('legacyAssets', account)
     setupLocalStorage('vaults', account)
     if (isEOAccount) {

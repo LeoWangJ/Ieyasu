@@ -70,26 +70,23 @@ export const settingURDAddressInStorage = async (account:string, signer:Signer) 
   const deployURD = await createURD(account, signer)
   console.log('deployURD:', deployURD)
 
-  const recipient = await deployVault['setData(bytes32,bytes)'](URD_DATA_KEY, deployURD.contractAddress, {
-    gasLimit: 300_0000
-  }) // Any other information can be stored here
-
-  // const executePayload = await myUP.interface.encodeFunctionData('execute(uint256,address,uint256,bytes)', [0, deployVault.contractAddress, 0, setDataPayload])
+  // const recipient = await deployVault['setData(bytes32,bytes)'](URD_DATA_KEY, deployURD.contractAddress, {
+  //   gasLimit: 300_0000
+  // }) // Any other information can be stored here
+  const setDataPayload = await deployVault.interface.encodeFunctionData('setData(bytes32,bytes)', [URD_DATA_KEY, deployURD.contractAddress])
+  const executePayload = await myUP.interface.encodeFunctionData('execute(uint256,address,uint256,bytes)', [0, deployVault.contractAddress, 0, setDataPayload])
   // const tx = await myUP.execute(0, deployVault.contractAddress, 0, setDataPayload, {
   //   gasLimit: 300_0000
   // })
-  // console.log(tx)
-  // const myKeyManagerAddress = await myUP.owner()
-  // const provider = ethers.providers.getDefaultProvider(RPC_URLS.L16)
-  // const myEOA = new ethers.Wallet('0x55c4e7d54bba3420010488372d6dac776f79074883c22ceba55611421a1715f1', provider)
+  const myKeyManagerAddress = await myUP.owner()
+  const provider = ethers.providers.getDefaultProvider(RPC_URLS.L16)
+  const myEOA = new ethers.Wallet('private key', provider)
 
-  // // create an instance of the KeyManager
-  // const myKM = new ethers.Contract(myKeyManagerAddress, LSP6KeyManager.abi, myEOA)
+  const myKM = new ethers.Contract(myKeyManagerAddress, LSP6KeyManager.abi, myEOA)
 
-  // // execute the executePayload on the KM
-  // return await myKM.execute(executePayload, {
-  //   gasLimit: 300_0000
-  // })
+  const recipient = await myKM.execute(executePayload, {
+    gasLimit: 300_0000
+  })
   return { hash: recipient.hash, address: deployVault.contractAddress }
 }
 

@@ -4,17 +4,37 @@ import { COMMON_ABIS, INTERFACEID, IPFS_GATEWAY_BASE_URL, LOCATION } from '@/uti
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP12IssuedAssetsSchema from '@erc725/erc725.js/schemas/LSP12IssuedAssets.json'
 import { ethers } from 'ethers'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import TokenAssets from './TokenAssets.vue'
 import NFTAssets from './NFTAssets.vue'
 import { Button } from 'vant'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+const store = useStore()
+
 const router = useRouter()
 const receivedAssets = ref<string[]>([])
 const receivedTokens = ref<string[]>([])
 const receivedNFTTokens = ref<string[]>([])
+
+const address = computed(() => store.state.currentAddress)
+watch([address], async (now, prev) => {
+  if (now !== prev) {
+    await getCreateAssets()
+  }
+})
+
 onMounted(async () => {
-  const { account, provider, ethereumProvider } = await getEthers()
+  if (store.state.currentAddress) {
+    await getCreateAssets()
+  }
+})
+const getCreateAssets = async () => {
+  receivedAssets.value = []
+  receivedTokens.value = []
+  receivedNFTTokens.value = []
+  const { provider, ethereumProvider } = await getEthers()
+  const account = store.state.currentAddress
   const controller = new ERC725(LSP12IssuedAssetsSchema as ERC725JSONSchema[], account, provider, {
     ipfsGateway: IPFS_GATEWAY_BASE_URL
   })
@@ -46,7 +66,7 @@ onMounted(async () => {
       console.error(`Could not find interface of the contract: ${address}`)
     }
   })
-})
+}
 </script>
 
 <template>
