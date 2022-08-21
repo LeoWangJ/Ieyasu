@@ -71,14 +71,19 @@ const openDialog = () => {
     </Cell>
   </div>
   <DialogComponent v-model:show="showDialog" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
-    class="h-full max-w-screen-md !bg-primary !rounded-none">
+    class="h-full max-w-screen-md !bg-light !rounded-none">
     <component :is="component" v-model:show="showDialog" :assets="token"></component>
   </DialogComponent>
 </template>
 
 <style scoped>
 .cell {
-  --van-cell-border-color: black;
+  --van-cell-background-color: var(--color-bg-secondary);
+  --van-cell-active-color: var(--color-bg-secondary);
+  --van-cell-text-color: var(--color-text-primary);
+  --van-text-color: #C6C6C6;
+  --van-cell-value-color: #C6C6C6;
+  --van-cell-border-color: var(--color-bg-primary);
 }
 
 :deep(.van-cell) {

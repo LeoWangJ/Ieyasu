@@ -70,12 +70,12 @@ const getCreateAssets = async () => {
 </script>
 
 <template>
-  <div class="flex ">
-    <Button type="primary" @click="router.push({name: 'createToken'})">CREATE TOKEN</Button>
-    <Button type="primary" @click="router.push({name: 'createNFTToken'})">CREATE NFT</Button>
+  <div class="flex m-3">
+    <Button class="!mr-3" @click="router.push({name: 'createToken'})">CREATE TOKEN</Button>
+    <Button @click="router.push({name: 'createNFTToken'})">CREATE NFT</Button>
   </div>
   <div v-if="receivedTokens.length">
-    <p class="m-2">TOKENs</p>
+    <p class="m-2 text-primary">TOKENs</p>
     <TokenAssets
       :location="LOCATION.created"
       v-for="(address,index) in receivedTokens"
@@ -84,7 +84,7 @@ const getCreateAssets = async () => {
     </TokenAssets>
   </div>
   <div v-if="receivedNFTTokens.length">
-    <p class="m-2">NFTs</p>
+    <p class="m-2 text-primary">NFTs</p>
     <NFTAssets
       :location="LOCATION.created"
       v-for="(address,index) in receivedNFTTokens"
@@ -93,3 +93,10 @@ const getCreateAssets = async () => {
     </NFTAssets>
   </div>
 </template>
+<style scoped>
+:deep(.van-button){
+  --van-button-default-color: var(--color-text-primary);
+  --van-button-default-background-color: var(--color-theme);
+  --van-button-default-border-color: var(--color-theme);
+}
+</style>

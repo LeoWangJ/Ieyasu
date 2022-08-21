@@ -44,7 +44,7 @@ const login = async () => {
 </script>
 
 <template>
-  <NoticeBar color="#1989fa" background="#ecf9ff" wrapable left-icon="info-o" v-if="useOnlyOneExtension">
+  <NoticeBar color="#fff" background="#363636" wrapable left-icon="info-o" class="my-5" v-if="useOnlyOneExtension">
     <p>
       If you have MetaMask and Universal Profile Browser Extension installed, please disable MetaMask! See these guides for
       <a class="text-theme" href="https://support.google.com/chrome_webstore/answer/2664769?hl=en" target="_blank">Chrome</a>
@@ -52,7 +52,7 @@ const login = async () => {
       <a class="text-theme" href="https://support.mozilla.org/en-US/kb/disable-or-remove-add-ons#w_disabling-and-removing-extensions" target="_blank">Firefox</a>.
     </p>
   </NoticeBar>
-  <NoticeBar color="#1989fa" background="#ecf9ff" wrapable left-icon="info-o" v-if="isUnSupportBrowser">
+  <NoticeBar color="#fff" background="#363636" wrapable  left-icon="info-o" v-if="isUnSupportBrowser">
     <p>
       The dApp only provides running in
       <a class="text-theme" href="https://www.google.com/chrome/" target="_blank">Chrome </a>
@@ -60,15 +60,22 @@ const login = async () => {
     </p>
   </NoticeBar>
   <template v-else>
-    <NoticeBar color="#1989fa" background="#ecf9ff" wrapable left-icon="info-o" v-if="requiresBrowserExtension">
+    <NoticeBar color="#fff" background="#363636" wrapable left-icon="info-o" v-if="requiresBrowserExtension">
     <p>
         Please install the
         <a class="text-theme" href="https://docs.lukso.tech/guides/browser-extension/install-browser-extension/" target="_blank">Universal Profile Browser Extension</a>
         to use this dApp.
       </p>
     </NoticeBar>
-    <div v-else-if="requiresLogin" class="flex justify-center mt-5">
-      <Button type="primary" @click="login">Log in to Universal Profile Browser Extension</Button>
-    </div>
   </template>
+  <div v-if="requiresLogin" class="flex justify-center mt-5">
+    <Button @click="login">Log in to browser Extension</Button>
+  </div>
 </template>
+<style scoped>
+:deep(.van-button){
+  --van-button-default-color: var(--color-text-primary);
+  --van-button-default-background-color:var(--color-theme);
+  --van-button-default-border-color:var(--color-theme);
+}
+</style>

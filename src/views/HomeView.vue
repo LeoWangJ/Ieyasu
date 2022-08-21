@@ -62,11 +62,37 @@ const clearLocalStorage = (itemName:string) => {
 </script>
 
 <template>
-  <ProfileInfo></ProfileInfo>
-  <Tabs v-model:active="active" animated>
+  <ProfileInfo ></ProfileInfo>
+  <Tabs v-model:active="active" animated clsss="tabs">
     <Tab v-for="item in tabs" :title="item.name" :key="item.id">
       <component :is="item.component"></component>
     </Tab>
   </Tabs>
 </template>
->
+<style scoped>
+:deep(.van-tab) {
+  height: 48px;
+  padding: 0 12px;
+  --van-tab-text-color: var(--color-text-primary);
+  --van-tab-active-text-color: var(--color-theme);
+  --van-tab-font-size: '14px';
+}
+:deep(.van-tabs__nav--line){
+  padding-bottom: 0;
+}
+:deep(.van-tab--active)::after{
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  width: 100%;
+  height: 2px;
+  background: var(--color-theme);
+}
+:deep(.van-tabs__wrap){
+  --van-tabs-line-height: '48px';
+  --van-tabs-nav-background-color:var(--color-bg-secondary);
+  --van-tabs-bottom-bar-width: '0px';
+  --van-tabs-bottom-bar-height: '2px';
+  --van-tabs-bottom-bar-color: var(--color-theme);
+}
+</style>

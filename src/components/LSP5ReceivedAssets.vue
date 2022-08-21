@@ -111,15 +111,16 @@ const transferLYX = async (recipientAddress:string, sendAmount:number) => {
 }
 
 const closeLegacy = async () => {
-  await getReceivedAssets()
-
   showLegacy.value = false
+  await getReceivedAssets()
 }
 
 </script>
 
 <template>
-  <van-button type="primary" @click="showLegacy = true">Find Legacy Assets</van-button>
+  <div class="flex m-3">
+    <van-button @click="showLegacy = true">FIND LEGACY ASSETS</van-button>
+  </div>
   <!-- <p class="m-2">TOKENs</p>
   <TokenAssets
     :location="LOCATION.received"
@@ -128,7 +129,7 @@ const closeLegacy = async () => {
     :key="index">
   </TokenAssets> -->
   <div v-if="receivedTokens.length">
-    <p class="m-2">TOKENs</p>
+    <p class="m-2 text-primary">TOKENs</p>
     <TokenAssets
       :location="LOCATION.received"
       :address="item.address"
@@ -137,7 +138,7 @@ const closeLegacy = async () => {
     </TokenAssets>
   </div>
   <div v-if="receivedNFTTokens.length">
-    <p class="m-2">NFTs</p>
+    <p class="m-2 text-primary">NFTs</p>
     <NFTAssets
       :location="LOCATION.received"
       :address="item.address"
@@ -147,7 +148,14 @@ const closeLegacy = async () => {
     </NFTAssets>
   </div>
   <DialogComponent v-model:show="showLegacy" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
-    class="h-full max-w-screen-md !bg-primary !rounded-none">
+    class="h-full max-w-screen-md !bg-light !rounded-none">
     <LegacyLSPAssets @close="closeLegacy"></LegacyLSPAssets>
   </DialogComponent>
 </template>
+<style scoped>
+:deep(.van-button){
+  --van-button-default-color: var(--color-text-primary);
+  --van-button-default-background-color: var(--color-theme);
+  --van-button-default-border-color: var(--color-theme);
+}
+</style>

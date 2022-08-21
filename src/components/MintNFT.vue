@@ -6,7 +6,7 @@ import { NFT } from '@/utils/types'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { ethers } from 'ethers'
-import { Toast } from 'vant'
+import { Toast, NoticeBar } from 'vant'
 
 const props = defineProps<{
   show: boolean,
@@ -91,26 +91,65 @@ const clickNavBar = () => {
 </script>
 
 <template>
-  <van-nav-bar :title="`Mint ${assets.name}(${assets.symbol}) Collection`" left-arrow @click-left="clickNavBar" />
-  <van-steps :active="step" active-icon="success" active-color="#38f">
-    <van-step>Input NFT Collection Infomation</van-step>
-    <van-step>Minting</van-step>
-    <van-step>🎉 Success</van-step>
-  </van-steps>
-  <p v-if="!isL16Network">
-    Please switch your network to LUKSO <span class="cursor-pointer text-theme" @click="addLuksoL16Testnet">L16
-    </span>to mint this collection.
-  </p>
-  <div v-if="step == 0">
-    <van-field v-model.number="mintInfo.tokenId" placeholder="tokenId" number label="Mint tokenID" />
-    <van-button type="primary" @click="mint" :disabled="disabled">MINT NFT Collection</van-button>
+  <div class="text-primary">
+    <van-nav-bar :title="`Mint ${assets.name}(${assets.symbol}) Collection`" left-arrow @click-left="clickNavBar" />
+    <van-steps :active="step" active-icon="success" class="my-2">
+      <van-step>Input Infomation</van-step>
+      <van-step>Minting</van-step>
+      <van-step>🎉 Success</van-step>
+    </van-steps>
+     <NoticeBar color="#fff" background="#363636" wrapable  left-icon="info-o" v-if="!isL16Network">
+      <p>
+        Please switch your network to LUKSO <span class="cursor-pointer text-theme" @click="addLuksoL16Testnet">L16
+        </span>to send this token.
+      </p>
+    </NoticeBar>
+    <div v-if="step == 0" class="mt-2">
+      <van-field v-model.number="mintInfo.tokenId" placeholder="tokenId" number label="Mint tokenID" />
+      <div class="flex m-3 justify-center">
+        <van-button  @click="mint" :disabled="disabled">MINT NFT Collection</van-button>
+      </div>
+    </div>
+    <div v-if="step == 1">
+      Minting... , please be patient!
+    </div>
+    <div v-if="step == 2" class="break-words">
+      🎉 Success: tx hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${txHash}`" target="_blank">{{
+        txHash }}</a>
+    </div>
+    <p v-if="error" class="text-[red]">{{error}}</p>
   </div>
-  <div v-if="step == 1">
-    Minting... , please be patient!
-  </div>
-  <div v-if="step == 2">
-    🎉 Success: tx hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${txHash}`" target="_blank">{{
-      txHash }}</a>
-  </div>
-  <p v-if="error" class="text-[red]">{{error}}</p>
 </template>
+<style scoped>
+:deep(.van-button){
+  --van-button-default-color: var(--color-text-primary);
+  --van-button-default-background-color: var(--color-theme);
+  --van-button-default-border-color: var(--color-theme);
+}
+:deep(.van-nav-bar){
+  --van-nav-bar-background-color:var(--color-bg-secondary);
+  --van-nav-bar-title-text-color:var(--color-text-primary);
+  --van-nav-bar-icon-color:var(--color-text-primary);
+}
+:deep(.van-hairline--bottom:after){
+  border-width: 0;
+}
+:deep(.van-steps){
+  --van-step-text-color:var(--color-text-primary);
+  --van-step-active-color:var(--color-theme);
+  --van-step-process-text-color:var(--color-text-primary);
+  --van-step-line-color:var(--color-text-primary);
+  --van-step-finish-line-color:var(--color-theme);
+  --van-step-finish-text-color:var(--color-text-primary);
+  --van-steps-background-color:var(--color-bg-secondary);
+  --van-background-color-light:var(--color-bg-secondary)
+}
+:deep(.van-cell){
+  --van-cell-background-color: var(--color-bg-secondary);
+  --van-cell-active-color: var(--color-bg-secondary);
+  --van-field-label-color: var(--color-text-primary);
+  --van-field-input-text-color: var(--color-text-primary);
+  --van-cell-border-color: var(--color-bg-primary);
+  --van-cell-value-color:var(--color-text-primary);
+}
+</style>

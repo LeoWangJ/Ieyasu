@@ -79,15 +79,14 @@ const copyHandler = (vaultAddress:string) => {
 }
 
 const clickNavBar = () => {
-  if (step.value === 1) {
-    disabled.value = false
-    step.value = 0
-    error.value = ''
-    txHash.value = ''
-    getVaults()
-  }
+  disabled.value = false
+  step.value = 0
+  error.value = ''
   error.value = ''
   showCreateVault.value = false
+  if (step.value === 1) {
+    getVaults()
+  }
 }
 
 const select = (address:string) => {
@@ -97,11 +96,13 @@ const select = (address:string) => {
 </script>
 
 <template>
-  <van-button type="primary" @click="createVault" :disabled="disabled">Create Own Vault</van-button>
-  <p class="m-2">My Vaults</p>
-  <van-radio-group v-model="store.state.currentAddress">
-    <van-cell-group inset>
-      <van-cell v-for="(vault,index) in vaults" :key="vault" size="large" inset center class="cell truncate" >
+  <div class="flex m-3">
+    <van-button @click="createVault" :disabled="disabled">CREATE VAULT</van-button>
+  </div>
+  <p class="m-2 text-primary">VAULTs</p>
+  <van-radio-group v-model="store.state.currentAddress" checked-color="var(--color-theme)">
+    <van-cell-group>
+      <van-cell v-for="(vault,index) in vaults" :key="vault" size="large" center class="cell truncate" >
         <template #title>
           <div class="text-shadow-lg">
           {{ `${vault.slice(0,8)}...${vault.slice(-6)}` }} <van-tag class="mr-1" v-if="index === 0">vaults owner</van-tag>
@@ -116,20 +117,71 @@ const select = (address:string) => {
   </van-radio-group>
 
   <DialogComponent v-model:show="showCreateVault" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
-    class="h-full max-w-screen-md !bg-primary !rounded-none">
-    <van-nav-bar title="Create Own Vault" left-arrow @click-left="clickNavBar" />
-    <van-steps :active="step" active-icon="success" active-color="#38f">
-      <van-step>Creating</van-step>
-      <van-step>🎉 Success</van-step>
-    </van-steps>
-    <div v-if="step == 0">
-      Need three times transactions , please be patient!
+    class="h-full max-w-screen-md !bg-light !rounded-none">
+    <div class="text-primary">
+      <van-nav-bar title="Create Own Vault" left-arrow @click-left="clickNavBar" />
+      <van-steps :active="step" active-icon="success" class="my-2">
+        <van-step>Creating</van-step>
+        <van-step>🎉 Success</van-step>
+      </van-steps>
+      <div v-if="step == 0">
+        Need three times transactions , please be patient!
+      </div>
+      <div v-if="step == 1" class="break-words">
+      🎉 Success: tx hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${txHash}`" target="_blank">{{
+            txHash
+        }}</a>
+      </div>
+      <p v-if="error" class="text-[red]">{{ error }}</p>
     </div>
-    <div v-if="step == 1">
-     🎉 Success: tx hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${txHash}`" target="_blank">{{
-          txHash
-      }}</a>
-    </div>
-    <p v-if="error" class="text-[red]">{{ error }}</p>
   </DialogComponent>
 </template>
+<style scoped>
+:deep(.van-button){
+  --van-button-default-color: var(--color-text-primary);
+  --van-button-default-background-color: var(--color-theme);
+  --van-button-default-border-color: var(--color-theme);
+}
+:deep(.van-hairline--top-bottom:after, .van-hairline-unset--top-bottom:after){
+  border-width: 0;
+}
+.cell {
+  --van-cell-background-color: var(--color-bg-secondary);
+  --van-cell-active-color: var(--color-bg-secondary);
+  --van-cell-text-color: var(--color-text-primary);
+  --van-text-color: #C6C6C6;
+  --van-cell-value-color: #C6C6C6;
+  --van-cell-border-color: var(--color-bg-primary);
+}
+
+:deep(.van-cell) {
+  padding-left: 5px;
+}
+
+:deep(.van-cell__title) {
+  margin-left: 10px;
+}
+
+:deep(.van-cell__left-icon) {
+  font-size: 30px;
+}
+
+:deep(.van-nav-bar){
+  --van-nav-bar-background-color:var(--color-bg-secondary);
+  --van-nav-bar-title-text-color:var(--color-text-primary);
+  --van-nav-bar-icon-color:var(--color-text-primary);
+}
+:deep(.van-hairline--bottom:after){
+  border-width: 0;
+}
+:deep(.van-steps){
+  --van-step-text-color:var(--color-text-primary);
+  --van-step-active-color:var(--color-theme);
+  --van-step-process-text-color:var(--color-text-primary);
+  --van-step-line-color:var(--color-text-primary);
+  --van-step-finish-line-color:var(--color-theme);
+  --van-step-finish-text-color:var(--color-text-primary);
+  --van-steps-background-color:var(--color-bg-secondary);
+  --van-background-color-light:var(--color-bg-secondary)
+}
+</style>

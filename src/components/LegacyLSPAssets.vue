@@ -26,6 +26,7 @@ const sendLegacyAddress = () => {
 
   Toast.success({
     message: 'success!',
+    duration: 1000,
     onClose: () => {
       emit('close')
     }
@@ -34,8 +35,35 @@ const sendLegacyAddress = () => {
 </script>
 
 <template>
-<van-nav-bar title="Find Legacy Assets" left-arrow @click-left="emit('close')"/>
-<van-field v-model="legacyAddress" placeholder="0x..." label="Legacy Assets Address" />
-<van-button type="primary" @click="sendLegacyAddress" :disabled="disabled">Confirm</van-button>
-<p v-if="error" class="text-[red]">{{ error }}</p>
+<div>
+  <van-nav-bar class="mb-2" title="Find Legacy Assets" left-arrow @click-left="emit('close')"/>
+  <van-field v-model="legacyAddress" placeholder="0x..." label="Assets Address" />
+  <div class="flex m-3 justify-center">
+    <van-button  @click="sendLegacyAddress" :disabled="disabled">CONFIRM</van-button>
+  </div>
+  <p v-if="error" class="text-[red]">{{ error }}</p>
+</div>
 </template>
+<style scoped>
+:deep(.van-button){
+  --van-button-default-color: var(--color-text-primary);
+  --van-button-default-background-color: var(--color-theme);
+  --van-button-default-border-color: var(--color-theme);
+}
+:deep(.van-nav-bar){
+  --van-nav-bar-background-color:var(--color-bg-secondary);
+  --van-nav-bar-title-text-color:var(--color-text-primary);
+  --van-nav-bar-icon-color:var(--color-text-primary);
+}
+:deep(.van-hairline--bottom:after){
+  border-width: 0;
+}
+:deep(.van-cell){
+  --van-cell-background-color: var(--color-bg-secondary);
+  --van-cell-active-color: var(--color-bg-secondary);
+  --van-field-label-color: var(--color-text-primary);
+  --van-field-input-text-color: var(--color-text-primary);
+  --van-cell-border-color: var(--color-bg-primary);
+  --van-cell-value-color:var(--color-text-primary);
+}
+</style>

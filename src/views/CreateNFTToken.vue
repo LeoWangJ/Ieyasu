@@ -150,49 +150,93 @@ const transaction = async (deployedAssetAddress: string) => {
 </script>
 
 <template>
-  <van-nav-bar title="Create NFT Collection" left-arrow @click-left="router.push({name:'home'})"/>
-  <div v-if="isEOA" >The NFT Collection has been deployed and configured correctly, but because of MetaMask, the asset can only be stored in the browser's local storage.</div>
-  <div v-if="!isDeploying && !deployEvent.length">
-    <div v-if="isL16Network" >
-        <h2>Create your own ERC721-like Collection based on <a class="text-theme" href="https://docs.lukso.tech/standards/nft-2.0/LSP8-Identifiable-Digital-Asset" target="_blank">LSP8</a></h2>
+  <div class="text-primary">
+    <van-nav-bar title="Create NFT Collection" left-arrow @click-left="router.push({name:'home'})"/>
+    <div v-if="isEOA" >The NFT Collection has been deployed and configured correctly, but because of MetaMask, the asset can only be stored in the browser's local storage.</div>
+    <div v-if="!isDeploying && !deployEvent.length">
+      <div v-if="isL16Network" >
+        <h2 class="m-2">Create your own ERC721-like Collection based on <a class="text-theme" href="https://docs.lukso.tech/standards/nft-2.0/LSP8-Identifiable-Digital-Asset" target="_blank">LSP8</a></h2>
         <van-field v-model="tokenInfo.name" placeholder="Name" />
         <van-field v-model="tokenInfo.symbol" placeholder="Token Symbol" />
         <van-field v-model="tokenInfo.description" placeholder="Description" />
-      <div>NFT Collection Icon</div>
-      <van-uploader v-model="tokenInfo.icon" multiple :max-count="2" />
-      <van-button type="primary" @click="deploy" :disabled="disabled">DEPLOY NFT Collection</van-button>
+        <div class="mx-2 flex flex-col items-center">
+          <div class="m-2">Choose NFT Collection Icon</div>
+          <van-uploader v-model="tokenInfo.icon" :max-count="1" />
+        </div>
+        <div class="flex m-3 justify-center">
+          <van-button  @click="deploy" :disabled="disabled">DEPLOY NFT COLLECTION</van-button>
+        </div>
+      </div>
+      <p v-else>
+        Please switch your network to LUKSO <span class="cursor-pointer text-theme" @click="addLuksoL16Testnet">L16 </span>to create this token.
+      </p>
     </div>
-    <p v-else>
-      Please switch your network to LUKSO <span class="cursor-pointer text-theme" @click="addLuksoL16Testnet">L16 </span>to create this token.
-    </p>
+    <div v-else class="text-primary">
+      <van-steps :active="step" active-icon="success" class="my-2">
+        <van-step>Deploying</van-step>
+        <van-step>Deployed</van-step>
+        <van-step>Transaction</van-step>
+        <van-step>🎉 Success</van-step>
+      </van-steps>
+      <div>
+        <p>Deploying Smart Contracts... </p>
+        <strong>Please confirm all transactions in your browser extension, and wait until they are added to the Blockchain.</strong>
+      </div>
+      <div v-for="(event, index) in deployEvent" :key="index">
+        <span v-if="event.type === 'PROXY_DEPLOYMENT' && event.status === 'COMPLETE'">
+          Contract deployed: {{ event.contractName }} ({{ event.type }}): <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/address/${event.contractAddress}`" target="_blank">{{ event.contractAddress }}</a
+          ><br />
+          Transaction hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${event.receipt.transactionHash}`" target="_blank">{{ event.receipt.transactionHash }}</a>
+        </span>
+        <br />
+        <span v-if="event.type === 'TRANSACTION' && event.status === 'COMPLETE'">
+          Function called: {{ event.functionName }}()<br />
+          Transaction hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${event.receipt.transactionHash}`" target="_blank">{{ event.receipt.transactionHash }}</a>
+        </span>
+        <span v-if="event.type === 'TRANSACTION' && event.status === 'PENDING'">
+          Function is calling: {{ event?.functionName }}()... WAIT IT!<br />
+        </span>
+      </div>
+      <div v-if="isSuccess">🎉 Success !!</div>
+    </div>
+    <p v-if="error" class="text-[red]">{{error}}</p>
   </div>
-  <div v-else>
-    <van-steps :active="step" active-icon="success" active-color="#38f">
-      <van-step>Deploying</van-step>
-      <van-step>Deployed</van-step>
-      <van-step>Transaction</van-step>
-      <van-step>🎉 Success</van-step>
-    </van-steps>
-    <div>
-      <p>Deploying Smart Contracts... </p>
-      <strong>Please confirm all transactions in your browser extension, and wait until they are added to the Blockchain.</strong>
-    </div>
-    <div v-for="(event, index) in deployEvent" :key="index">
-      <span v-if="event.type === 'PROXY_DEPLOYMENT' && event.status === 'COMPLETE'">
-        Contract deployed: {{ event.contractName }} ({{ event.type }}): <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/address/${event.contractAddress}`" target="_blank">{{ event.contractAddress }}</a
-        ><br />
-        Transaction hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${event.receipt.transactionHash}`" target="_blank">{{ event.receipt.transactionHash }}</a>
-      </span>
-      <br />
-      <span v-if="event.type === 'TRANSACTION' && event.status === 'COMPLETE'">
-        Function called: {{ event.functionName }}()<br />
-        Transaction hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${event.receipt.transactionHash}`" target="_blank">{{ event.receipt.transactionHash }}</a>
-      </span>
-      <span v-if="event.type === 'TRANSACTION' && event.status === 'PENDING'">
-        Function is calling: {{ event?.functionName }}()... WAIT IT!<br />
-      </span>
-    </div>
-    <div v-if="isSuccess">🎉 Success !!</div>
-  </div>
-  <p v-if="error" class="text-[red]">{{error}}</p>
 </template>
+<style scoped>
+:deep(.van-button){
+  --van-button-default-color: var(--color-text-primary);
+  --van-button-default-background-color: var(--color-theme);
+  --van-button-default-border-color: var(--color-theme);
+}
+:deep(.van-nav-bar){
+  --van-nav-bar-background-color:var(--color-bg-secondary);
+  --van-nav-bar-title-text-color:var(--color-text-primary);
+  --van-nav-bar-icon-color:var(--color-text-primary);
+}
+:deep(.van-hairline--bottom:after){
+  border-width: 0;
+}
+:deep(.van-steps){
+  --van-step-text-color:var(--color-text-primary);
+  --van-step-active-color:var(--color-theme);
+  --van-step-process-text-color:var(--color-text-primary);
+  --van-step-line-color:var(--color-text-primary);
+  --van-step-finish-line-color:var(--color-theme);
+  --van-step-finish-text-color:var(--color-text-primary);
+  --van-steps-background-color:var(--color-bg-secondary);
+  --van-background-color-light:var(--color-bg-secondary)
+}
+:deep(.van-cell){
+  --van-cell-background-color: var(--color-bg-secondary);
+  --van-cell-active-color: var(--color-bg-secondary);
+  --van-field-label-color: var(--color-text-primary);
+  --van-field-input-text-color: var(--color-text-primary);
+  --van-cell-border-color: var(--color-bg-primary);
+  --van-cell-value-color:var(--color-text-primary);
+}
+:deep(.van-uploader){
+  --van-uploader-size: 120px;
+  --van-uploader-upload-background-color:var(--color-bg-secondary);
+  --van-uploader-upload-active-color:var(--color-bg-primary);
+}
+</style>
