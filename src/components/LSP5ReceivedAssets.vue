@@ -116,14 +116,10 @@ const closeLegacy = async () => {
   showLegacy.value = false
 }
 
-const select = () => {
-  store.commit('switchAddress', '0x5f5661484C87680a41F2300D00E4ec616c2603d8')
-}
 </script>
 
 <template>
   <van-button type="primary" @click="showLegacy = true">Find Legacy Assets</van-button>
-  <van-button type="primary" @click="select">Switch Vault Assets</van-button>
   <!-- <p class="m-2">TOKENs</p>
   <TokenAssets
     :location="LOCATION.received"
