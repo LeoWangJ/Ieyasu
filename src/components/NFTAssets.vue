@@ -79,6 +79,8 @@ const openDialog = () => {
     <Cell size="large" inset center class="cell truncate" is-link :icon="nft.icon" @click="openDialog">
       <template #title>
         {{ nft.name }}<span v-if="nft.symbol">({{ nft.symbol }})</span>
+      </template>
+      <template #value>
         <span>{{ LOCATION.created === location ? `Supply : ${nft.balance}` : `` }}</span>
       </template>
     </Cell>

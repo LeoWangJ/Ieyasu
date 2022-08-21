@@ -66,6 +66,8 @@ const openDialog = () => {
     <Cell size="large" inset center class="cell truncate" is-link :icon="token.icon" @click="openDialog">
       <template #title>
         {{ token.name }}<span v-if="token.symbol">({{ token.symbol }})</span>
+      </template>
+      <template #value>
         <span>{{ LOCATION.created === location ? `Supply` : `balanceOf` }}: {{ token.balance }}</span>
       </template>
     </Cell>

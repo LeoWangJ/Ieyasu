@@ -8,6 +8,7 @@ import { BLOCKCHAIN_EXPLORER_BASE_URL, RPC_URLS } from '@/utils/config'
 import { getEthers } from '@/composables/ethers'
 import { ethers, Signer } from 'ethers'
 import { Toast, NoticeBar } from 'vant'
+import { handlerIPFSImg } from '@/utils'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import LSP6KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
 
@@ -142,6 +143,14 @@ const clickNavBar = () => {
     </NoticeBar>
 
     <div v-if="step == 0" class="mt-2">
+      <div class="flex  flex-col items-center mb-2">
+        <p class="m-2 text-primary">{{assets.name}}({{assets.symbol}})</p>
+        <van-image
+          width="10rem"
+          height="10rem"
+          :src="handlerIPFSImg(assets.icon)"
+        ></van-image>
+      </div>
       <van-field v-model="recipientAddress" placeholder="0x..." label="Recipient Address" />
       <van-field v-if="!assets.isNFT" v-model.number="sendAmount" label="Amount To Send" />
       <div class="flex m-3 justify-center">

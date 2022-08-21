@@ -17,7 +17,6 @@ import LegacyLSPAssets from './LegacyLSPAssets.vue'
 import { useStore } from 'vuex'
 const store = useStore()
 
-const { provider, ethereumProvider } = await getEthers()
 const receivedAssets = ref<string[]>([])
 const receivedTokens = ref<ReceivedTokens[]>([])
 const receivedNFTTokens = ref<ReceivedTokens[]>([])
@@ -36,6 +35,7 @@ watch([address], async (now, prev) => {
   }
 })
 const getReceivedAssets = async () => {
+  const { provider, ethereumProvider } = await getEthers()
   receivedAssets.value = []
   receivedTokens.value = []
   receivedNFTTokens.value = []

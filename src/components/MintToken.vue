@@ -7,6 +7,7 @@ import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { ethers } from 'ethers'
 import { Toast, NoticeBar } from 'vant'
+import { handlerIPFSImg } from '@/utils'
 
 const props = defineProps<{
   show: boolean,
@@ -102,6 +103,14 @@ const clickNavBar = () => {
     </NoticeBar>
 
     <div v-if="step == 0" class="mt-2">
+      <div class="flex  flex-col items-center mb-2">
+        <p class="m-2 text-primary">{{assets.name}}({{assets.symbol}})</p>
+        <van-image
+          width="10rem"
+          height="10rem"
+          :src="handlerIPFSImg(assets.icon)"
+        ></van-image>
+      </div>
       <van-field v-model.number="mintAmount" placeholder="mint amount" number label="Mint Amount" />
       <div class="flex m-3 justify-center">
         <van-button  @click="mint" :disabled="disabled">MINT TOKEN</van-button>

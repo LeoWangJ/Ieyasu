@@ -74,7 +74,7 @@ const createVault = async () => {
 }
 const copyHandler = (vaultAddress:string) => {
   address.value = vaultAddress
-  copy()
+  copy(vaultAddress)
   if (copied) return Toast.success('copied!')
 }
 
@@ -106,7 +106,7 @@ const select = (address:string) => {
         <template #title>
           <div class="text-shadow-lg">
           {{ `${vault.slice(0,8)}...${vault.slice(-6)}` }} <van-tag class="mr-1" v-if="index === 0">vaults owner</van-tag>
-          <van-icon name="link-o" @click="copyHandler" class="cursor-pointer"/>
+          <van-icon name="link-o" @click="copyHandler(vault)" class="cursor-pointer"/>
           </div>
         </template>
         <template #right-icon>
