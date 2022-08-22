@@ -11,9 +11,9 @@ export default createStore({
   },
   mutations: {
     switchAddress (state, address:string) {
-      if (address === state.currentAddress) {
+      if (address === state.account) {
         state.isVault = false
-        return address
+        return
       }
       if (state.LSP10Vaults.value.indexOf(address as never) !== -1 || address === state.account) {
         state.currentAddress = address

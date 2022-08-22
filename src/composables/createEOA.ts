@@ -78,16 +78,33 @@ export const settingURDAddressInStorage = async (account:string, signer:Signer) 
   // const tx = await myUP.execute(0, deployVault.contractAddress, 0, setDataPayload, {
   //   gasLimit: 300_0000
   // })
+  const recipient = await executeByKM({
+    account,
+    signer,
+    executePayload,
+    privateKey: process.env.VUE_APP_PRIVATE_KEY as string
+  })
+  return { hash: recipient.hash, address: deployVault.contractAddress }
+}
+interface ExecuteByKMParameter{
+  account:string
+  signer:Signer
+  executePayload:string
+  privateKey:string
+}
+
+export const executeByKM = async ({ account, signer, executePayload, privateKey }:ExecuteByKMParameter) => {
+  const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
   const myKeyManagerAddress = await myUP.owner()
   const provider = ethers.providers.getDefaultProvider(RPC_URLS.L16)
-  const myEOA = new ethers.Wallet('private key', provider)
+  const myEOA = new ethers.Wallet(privateKey, provider)
 
   const myKM = new ethers.Contract(myKeyManagerAddress, LSP6KeyManager.abi, myEOA)
 
   const recipient = await myKM.execute(executePayload, {
     gasLimit: 300_0000
   })
-  return { hash: recipient.hash, address: deployVault.contractAddress }
+  return recipient
 }
 
 export const setAddressPermission = async (account:string, myVaultAddress:string, signer:Signer, thirdPartyAddress:string) => {

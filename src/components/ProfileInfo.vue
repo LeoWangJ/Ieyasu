@@ -54,7 +54,7 @@ onMounted(async () => {
   }
 })
 const copyHandler = () => {
-  copy()
+  copy(info.address)
   if (copied) return Toast.success('copied!')
 }
 </script>

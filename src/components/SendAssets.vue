@@ -11,8 +11,10 @@ import { Toast, NoticeBar } from 'vant'
 import { handlerIPFSImg } from '@/utils'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import LSP6KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
+import LSP9Vault from '@lukso/lsp-smart-contracts/artifacts/LSP9Vault.json'
 
 import { useStore } from 'vuex'
+import { executeByKM } from '@/composables/createEOA'
 const store = useStore()
 
 const props = defineProps<{
@@ -85,10 +87,17 @@ const sendLSP7Token = async (fromAddress: string, signer: Signer) => {
   const { account } = await getEthers()
 
   if (store.state.isVault) {
-    // TODO
-    const executePayloadVault = await controller.interface.encodeFunctionData('transfer(address,address,uint256,bool,bytes)', [fromAddress, recipientAddress.value, amount, isRecipientEOA.value, '0x'])
-    const receipt = await controller.transfer(fromAddress, recipientAddress.value, amount, isRecipientEOA.value, '0x', {
-      gasLimit: 300_0000
+    const targetPayload = await controller.interface.encodeFunctionData('transfer(address,address,uint256,bool,bytes)', [fromAddress, recipientAddress.value, amount.toString(), isRecipientEOA.value, '0x'])
+    const myVault = new ethers.Contract(fromAddress, LSP9Vault.abi)
+    const executePayloadVault = await myVault.interface.encodeFunctionData('execute(uint256,address,uint256,bytes)', [0, controller.address, 0, targetPayload])
+    const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
+    const executePayload = await myUP.interface.encodeFunctionData('execute(uint256,address,uint256,bytes)', [0, fromAddress, 0, executePayloadVault])
+
+    const receipt = await executeByKM({
+      account,
+      signer,
+      executePayload,
+      privateKey: process.env.VUE_APP_PRIVATE_KEY as string
     })
     txHash.value = receipt.hash
   } else {
@@ -101,11 +110,27 @@ const sendLSP7Token = async (fromAddress: string, signer: Signer) => {
 
 const sendLSP8Token = async (fromAddress: string, signer: Signer) => {
   const controller = new ethers.Contract(props.assets.address, LSP8IdentifiableDigitalAsset.abi, signer)
+  const { account } = await getEthers()
+  if (store.state.isVault) {
+    const targetPayload = await controller.interface.encodeFunctionData('transfer(address,address,bytes32,bool,bytes)', [fromAddress, recipientAddress.value, props.assets.tokenId, isRecipientEOA.value, '0x'])
+    const myVault = new ethers.Contract(fromAddress, LSP9Vault.abi)
+    const executePayloadVault = await myVault.interface.encodeFunctionData('execute(uint256,address,uint256,bytes)', [0, controller.address, 0, targetPayload])
+    const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
+    const executePayload = await myUP.interface.encodeFunctionData('execute(uint256,address,uint256,bytes)', [0, fromAddress, 0, executePayloadVault])
 
-  const receipt = await controller.transfer(fromAddress, recipientAddress.value, props.assets.tokenId, isRecipientEOA.value, '0x', {
-    gasLimit: 300_0000
-  })
-  txHash.value = receipt.hash
+    const receipt = await executeByKM({
+      account,
+      signer,
+      executePayload,
+      privateKey: process.env.VUE_APP_PRIVATE_KEY as string
+    })
+    txHash.value = receipt.hash
+  } else {
+    const receipt = await controller.transfer(fromAddress, recipientAddress.value, props.assets.tokenId, isRecipientEOA.value, '0x', {
+      gasLimit: 300_0000
+    })
+    txHash.value = receipt.hash
+  }
 }
 
 const clickNavBar = () => {
