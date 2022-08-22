@@ -4,7 +4,7 @@ import LSP10ReceivedVaultsSchema from '@erc725/erc725.js/schemas/LSP10ReceivedVa
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import { getEthers } from '@/composables/ethers'
 import { settingURDAddressInStorage } from '@/composables/createEOA'
-import { Dialog, Toast } from 'vant'
+import { Dialog, Toast, NoticeBar } from 'vant'
 import { useClipboard } from '@vueuse/core'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
@@ -26,7 +26,6 @@ const { copy, copied } = useClipboard({ source: address })
 onMounted(async () => {
   await getVaults()
 })
-
 const checkNetwork = async () => {
   isL16Network.value = await isLuksoNetwork()
 }
@@ -54,6 +53,8 @@ const getVaults = async () => {
 }
 
 const createVault = async () => {
+  await checkNetwork()
+  if (!isL16Network.value) return
   disabled.value = true
   showCreateVault.value = true
   const { account, signer } = await getEthers()
@@ -99,6 +100,13 @@ const select = (address:string) => {
   <div class="flex m-3">
     <van-button @click="createVault" :disabled="disabled">CREATE VAULT</van-button>
   </div>
+
+  <NoticeBar color="#fff" background="#363636" wrapable  left-icon="info-o" v-if="!isL16Network">
+    <p>
+      Please switch your network to LUKSO <span class="cursor-pointer text-theme" @click="addLuksoL16Testnet">L16
+      </span>to send this token.
+    </p>
+  </NoticeBar>
   <p class="m-2 text-primary">VAULTs</p>
   <van-radio-group v-model="store.state.currentAddress" checked-color="var(--color-theme)">
     <van-cell-group>

@@ -90,29 +90,21 @@ export const settingURDAddressInStorage = async (account:string, signer:Signer) 
   return { hash: recipient.hash, address: deployVault.contractAddress }
 }
 
-export const setAddressPermission = async (account:string, signer:Signer, thirdPartyAddress:string) => {
-  const myVaultAddress = '0x..' // address of the Vault
-
-  // create an instance of the UP
+export const setAddressPermission = async (account:string, myVaultAddress:string, signer:Signer, thirdPartyAddress:string) => {
   const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
+  const allowedAddressesDataKey = ERC725YKeys.LSP6['AddressPermissions:AllowedAddresses'] + thirdPartyAddress.substring(2)
+  const abiCoder = new ethers.utils.AbiCoder()
+  const arrayOfAddresses = abiCoder.encode(['address'], [myVaultAddress])
+  const setDataPayload = await myUP.interface.encodeFunctionData('setData(bytes32,bytes)', [allowedAddressesDataKey, arrayOfAddresses])
 
-  const allowedAddressesDataKey = // constructing the data key of allowed addresses
-    ERC725YKeys.LSP6['AddressPermissions:AllowedAddresses'] +
-    thirdPartyAddress.substring(2) // of the 3rd party
+  const myKeyManagerAddress = await myUP.owner()
 
-  // the data value holding the addresses that the 3rd party is allowed to interact with
-  const arrayOfAddresses = ethers.utils.defaultAbiCoder.encode(['address'], [myVaultAddress])
-
-  // encode setData payload on the UP
-  const setDataPayload = await myUP['setData(bytes32,bytes)'](allowedAddressesDataKey, arrayOfAddresses)
-  console.log('setDataPayload:', setDataPayload)
-
-  // getting the Key Manager address from UP
-  // const myKeyManagerAddress = await myUP.methods.owner()
-
-  // // create an instance of the KeyManager
-  // const myKM = new ethers.Contract(myKeyManagerAddress, LSP6KeyManager.abi)
-
-  // // execute the setDataPayload on the KM
-  // await myKM.execute(setDataPayload)
+  const PRIVATE_KEY = '0x...'
+  const provider = ethers.providers.getDefaultProvider(RPC_URLS.L16)
+  const myEOA = new ethers.Wallet(PRIVATE_KEY, provider)
+  const myKM = new ethers.Contract(myKeyManagerAddress, LSP6KeyManager.abi, myEOA)
+  const recipient = await myKM.execute(setDataPayload, {
+    gasLimit: 300_0000
+  })
+  return recipient
 }
