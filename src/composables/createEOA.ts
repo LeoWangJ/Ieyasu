@@ -6,6 +6,41 @@ import { RPC_URLS, CHAIN_IDS } from '@/utils/config'
 import { ERC725YKeys } from '@lukso/lsp-smart-contracts/constants.js'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
 import LSP6KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
+import LSP6Schema from '@erc725/erc725.js/schemas/LSP6KeyManager.json'
+import { ERC725, ERC725JSONSchema } from '@erc725/erc725.js'
+
+interface ExecuteByKMParameter{
+  account:string
+  signer:Signer
+  executePayload:string
+  privateKey:string
+}
+
+interface Permissions {
+  CHANGEOWNER?: boolean;
+  CHANGEPERMISSIONS?: boolean;
+  ADDPERMISSIONS?: boolean;
+  SETDATA?: boolean;
+  CALL?: boolean;
+  STATICCALL?: boolean;
+  DELEGATECALL?: boolean;
+  DEPLOY?: boolean;
+  TRANSFERVALUE?: boolean;
+  SIGN?: boolean;
+  SUPER_SETDATA?: boolean;
+  SUPER_TRANSFERVALUE?: boolean;
+  SUPER_CALL?: boolean;
+  SUPER_STATICCALL?: boolean;
+  SUPER_DELEGATECALL?: boolean;
+}
+
+interface KMPermission{
+  account:string
+  signer:Signer
+  privateKey:string
+  thirdPartyAddress:string
+  permissions:Permissions
+}
 
 export const createEOA = () => {
   const myEOA = ethers.Wallet.createRandom()
@@ -60,37 +95,20 @@ export const createMyVault = async (address:string, signer:Signer) => {
   }
 }
 
-export const settingURDAddressInStorage = async (account:string, signer:Signer) => {
+export const settingURDAddressInStorage = async (account:string, signer:Signer, privateKey:string) => {
   const URD_DATA_KEY = ERC725YKeys.LSP0.LSP1UniversalReceiverDelegate
-
   const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
   const deployVault:any = await createMyVault(account, signer)
-
-  console.log('deploy:', deployVault)
   const deployURD = await createURD(account, signer)
-  console.log('deployURD:', deployURD)
-
-  // const recipient = await deployVault['setData(bytes32,bytes)'](URD_DATA_KEY, deployURD.contractAddress, {
-  //   gasLimit: 300_0000
-  // }) // Any other information can be stored here
   const setDataPayload = await deployVault.interface.encodeFunctionData('setData(bytes32,bytes)', [URD_DATA_KEY, deployURD.contractAddress])
   const executePayload = await myUP.interface.encodeFunctionData('execute(uint256,address,uint256,bytes)', [0, deployVault.contractAddress, 0, setDataPayload])
-  // const tx = await myUP.execute(0, deployVault.contractAddress, 0, setDataPayload, {
-  //   gasLimit: 300_0000
-  // })
   const recipient = await executeByKM({
     account,
     signer,
     executePayload,
-    privateKey: process.env.VUE_APP_PRIVATE_KEY as string
+    privateKey
   })
   return { hash: recipient.hash, address: deployVault.contractAddress }
-}
-interface ExecuteByKMParameter{
-  account:string
-  signer:Signer
-  executePayload:string
-  privateKey:string
 }
 
 export const executeByKM = async ({ account, signer, executePayload, privateKey }:ExecuteByKMParameter) => {
@@ -98,30 +116,61 @@ export const executeByKM = async ({ account, signer, executePayload, privateKey 
   const myKeyManagerAddress = await myUP.owner()
   const provider = ethers.providers.getDefaultProvider(RPC_URLS.L16)
   const myEOA = new ethers.Wallet(privateKey, provider)
-
   const myKM = new ethers.Contract(myKeyManagerAddress, LSP6KeyManager.abi, myEOA)
-
   const recipient = await myKM.execute(executePayload, {
     gasLimit: 300_0000
   })
   return recipient
 }
 
-export const setAddressPermission = async (account:string, myVaultAddress:string, signer:Signer, thirdPartyAddress:string) => {
+export const setKMPermission = async ({ account, signer, privateKey, thirdPartyAddress, permissions }:KMPermission) => {
+  const erc725 = new ERC725(LSP6Schema as ERC725JSONSchema[])
+  const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
+  // step 2 - setup the permissions of the beneficiary address
+  const beneficiaryPermissions = erc725.encodePermissions(permissions)
+
+  // step 3.1 - encode the data key-value pairs of the permissions to be set
+  const data = erc725.encodeData({
+    keyName: 'AddressPermissions:Permissions:<address>',
+    dynamicKeyParts: thirdPartyAddress,
+    value: beneficiaryPermissions as string
+  })
+  console.log(data)
+  //   step 3.2 - encode the payload to be sent to the Key Manager contract
+  const executePayload = await myUP.interface.encodeFunctionData('setData(bytes32,bytes)', [data.keys[0], data.values[0]])
+  const recipient = await executeByKM({
+    account,
+    signer,
+    executePayload,
+    privateKey
+  })
+
+  const result = await myUP.getData(data.keys[0], {
+    gasLimit: 300_0000
+  })
+
+  console.log(`The beneficiary address ${thirdPartyAddress} has now the following permissions:`, erc725.decodePermissions(result))
+  return recipient
+}
+
+/**
+ * 看起來是要先設置 KM 第三方權限後，再把第三方地址設定到 vault , 使第三方操作時是對 vault 操作
+ * @param account
+ * @param myVaultAddress
+ * @param signer
+ * @param thirdPartyAddress
+ */
+export const setVaultPermission = async (account:string, myVaultAddress:string, signer:Signer, privateKey:string, thirdPartyAddress:string) => {
   const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
   const allowedAddressesDataKey = ERC725YKeys.LSP6['AddressPermissions:AllowedAddresses'] + thirdPartyAddress.substring(2)
   const abiCoder = new ethers.utils.AbiCoder()
   const arrayOfAddresses = abiCoder.encode(['address'], [myVaultAddress])
   const setDataPayload = await myUP.interface.encodeFunctionData('setData(bytes32,bytes)', [allowedAddressesDataKey, arrayOfAddresses])
-
-  const myKeyManagerAddress = await myUP.owner()
-
-  const PRIVATE_KEY = '0x...'
-  const provider = ethers.providers.getDefaultProvider(RPC_URLS.L16)
-  const myEOA = new ethers.Wallet(PRIVATE_KEY, provider)
-  const myKM = new ethers.Contract(myKeyManagerAddress, LSP6KeyManager.abi, myEOA)
-  const recipient = await myKM.execute(setDataPayload, {
-    gasLimit: 300_0000
+  const recipient = await executeByKM({
+    account,
+    signer,
+    executePayload: setDataPayload,
+    privateKey
   })
   return recipient
 }

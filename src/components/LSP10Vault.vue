@@ -59,7 +59,7 @@ const createVault = async () => {
   showCreateVault.value = true
   const { account, signer } = await getEthers()
   try {
-    const recipient = await settingURDAddressInStorage(account, signer)
+    const recipient = await settingURDAddressInStorage(account, signer, process.env.VUE_APP_PRIVATE_KEY as string)
     if (localStorage.getItem('vaults')) {
       const LSP9Vaults = JSON.parse(localStorage.getItem('vaults') as string)
       LSP9Vaults.value = [...LSP9Vaults.value, recipient.address]
