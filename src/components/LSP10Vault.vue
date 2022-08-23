@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import LSP10ReceivedVaultsSchema from '@erc725/erc725.js/schemas/LSP10ReceivedVaults.json'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import { getEthers } from '@/composables/ethers'
-import { settingURDAddressInStorage } from '@/composables/createEOA'
+import { setKMPermission, settingURDAddressInStorage, setVaultPermission } from '@/composables/createEOA'
 import { Dialog, Toast, NoticeBar } from 'vant'
 import { useClipboard } from '@vueuse/core'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
@@ -19,6 +19,7 @@ const vaults = ref<string[]>([])
 const address = ref('')
 const isL16Network = ref(true)
 const showCreateVault = ref(false)
+const showSettingPermission = ref(false)
 const DialogComponent = Dialog.Component
 
 const { copy, copied } = useClipboard({ source: address })
@@ -94,6 +95,28 @@ const select = (address:string) => {
   Toast.success('switch done!')
   store.commit('switchAddress', address)
 }
+
+const settingPermission = async () => {
+  showSettingPermission.value = true
+  const { account, signer } = await getEthers()
+  const privateKey = process.env.VUE_APP_PRIVATE_KEY as string
+  const thirdPartyAddress = '0x3456097b1012df324f37db58F2Ad08Ac62c69064'
+  const permissions = {
+    TRANSFERVALUE: true,
+    SETDATA: true,
+    DEPLOY: true
+  }
+  const t = await setKMPermission({
+    account,
+    signer,
+    privateKey,
+    thirdPartyAddress,
+    permissions
+  })
+  // const t2 = await setVaultPermission(account, store.state.currentAddress, signer, privateKey, thirdPartyAddress)
+
+  console.log(t)
+}
 </script>
 
 <template>
@@ -107,7 +130,7 @@ const select = (address:string) => {
       </span>to send this token.
     </p>
   </NoticeBar>
-  <p class="m-2 text-primary">VAULTs</p>
+  <p class="m-2 text-primary">OWNER & VAULTs</p>
   <van-radio-group v-model="store.state.currentAddress" checked-color="var(--color-theme)">
     <van-cell-group>
       <van-cell v-for="(vault,index) in vaults" :key="vault" size="large" center class="cell truncate" >
@@ -119,6 +142,7 @@ const select = (address:string) => {
         </template>
         <template #right-icon>
           <van-radio :name="vault"  @click="select(vault)"/>
+          <van-icon name="setting-o" size="24" class="ml-3 cursor-pointer" @click="settingPermission"/>
         </template>
       </van-cell>
     </van-cell-group>
@@ -128,6 +152,26 @@ const select = (address:string) => {
     class="h-full max-w-screen-md !bg-light !rounded-none">
     <div class="text-primary">
       <van-nav-bar title="Create Own Vault" left-arrow @click-left="clickNavBar" />
+      <van-steps :active="step" active-icon="success" class="my-2">
+        <van-step>Creating</van-step>
+        <van-step>🎉 Success</van-step>
+      </van-steps>
+      <div v-if="step == 0">
+        Need three times transactions , please be patient!
+      </div>
+      <div v-if="step == 1" class="break-words">
+      🎉 Success: tx hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${txHash}`" target="_blank">{{
+            txHash
+        }}</a>
+      </div>
+      <p v-if="error" class="text-[red]">{{ error }}</p>
+    </div>
+  </DialogComponent>
+
+  <DialogComponent v-model:show="showSettingPermission" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
+    class="h-full max-w-screen-md !bg-light !rounded-none">
+    <div class="text-primary">
+      <van-nav-bar title="Setting Permission" left-arrow @click-left="clickNavBar" />
       <van-steps :active="step" active-icon="success" class="my-2">
         <van-step>Creating</van-step>
         <van-step>🎉 Success</van-step>
