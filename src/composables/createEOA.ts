@@ -126,17 +126,12 @@ export const executeByKM = async ({ account, signer, executePayload, privateKey 
 export const setKMPermission = async ({ account, signer, privateKey, thirdPartyAddress, permissions }:KMPermission) => {
   const erc725 = new ERC725(LSP6Schema as ERC725JSONSchema[])
   const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
-  // step 2 - setup the permissions of the beneficiary address
   const beneficiaryPermissions = erc725.encodePermissions(permissions)
-
-  // step 3.1 - encode the data key-value pairs of the permissions to be set
-  const data = erc725.encodeData({
+  const data = erc725.encodeData([{
     keyName: 'AddressPermissions:Permissions:<address>',
     dynamicKeyParts: thirdPartyAddress,
     value: beneficiaryPermissions as string
-  })
-  console.log(data)
-  //   step 3.2 - encode the payload to be sent to the Key Manager contract
+  }])
   const executePayload = await myUP.interface.encodeFunctionData('setData(bytes32,bytes)', [data.keys[0], data.values[0]])
   const recipient = await executeByKM({
     account,
@@ -144,22 +139,9 @@ export const setKMPermission = async ({ account, signer, privateKey, thirdPartyA
     executePayload,
     privateKey
   })
-
-  const result = await myUP.getData(data.keys[0], {
-    gasLimit: 300_0000
-  })
-
-  console.log(`The beneficiary address ${thirdPartyAddress} has now the following permissions:`, erc725.decodePermissions(result))
   return recipient
 }
 
-/**
- * 看起來是要先設置 KM 第三方權限後，再把第三方地址設定到 vault , 使第三方操作時是對 vault 操作
- * @param account
- * @param myVaultAddress
- * @param signer
- * @param thirdPartyAddress
- */
 export const setVaultPermission = async (account:string, myVaultAddress:string, signer:Signer, privateKey:string, thirdPartyAddress:string) => {
   const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
   const allowedAddressesDataKey = ERC725YKeys.LSP6['AddressPermissions:AllowedAddresses'] + thirdPartyAddress.substring(2)
