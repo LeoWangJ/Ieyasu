@@ -1,32 +1,31 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import LSP10ReceivedVaultsSchema from '@erc725/erc725.js/schemas/LSP10ReceivedVaults.json'
-import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
+import { onMounted, ref, shallowRef } from 'vue'
+import type { Component } from 'vue'
+// import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import { getEthers } from '@/composables/ethers'
-import { setKMPermission, settingURDAddressInStorage, setVaultPermission } from '@/composables/createEOA'
 import { Dialog, Toast, NoticeBar } from 'vant'
 import { useClipboard } from '@vueuse/core'
-import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { useStore } from 'vuex'
+import CreateVault from './CreateVault.vue'
+import SetPermission from './SetPermission.vue'
 const store = useStore()
 
 const disabled = ref(false)
-const error = ref('')
-const step = ref(0)
-const txHash = ref('')
 const vaults = ref<string[]>([])
 const address = ref('')
 const isL16Network = ref(true)
-const showCreateVault = ref(false)
-const showSettingPermission = ref(false)
+const showDialog = ref(false)
 const DialogComponent = Dialog.Component
+const component:Component = shallowRef(undefined)
 
 const { copy, copied } = useClipboard({ source: address })
 
 onMounted(async () => {
   await getVaults()
+  await checkNetwork()
 })
+
 const checkNetwork = async () => {
   isL16Network.value = await isLuksoNetwork()
 }
@@ -53,42 +52,10 @@ const getVaults = async () => {
   console.log('LSP10Vaults:', vaults.value)
 }
 
-const createVault = async () => {
-  await checkNetwork()
-  if (!isL16Network.value) return
-  disabled.value = true
-  showCreateVault.value = true
-  const { account, signer } = await getEthers()
-  try {
-    const recipient = await settingURDAddressInStorage(account, signer, process.env.VUE_APP_PRIVATE_KEY as string)
-    if (localStorage.getItem('vaults')) {
-      const LSP9Vaults = JSON.parse(localStorage.getItem('vaults') as string)
-      LSP9Vaults.value = [...LSP9Vaults.value, recipient.address]
-      localStorage.setItem('vaults', JSON.stringify(LSP9Vaults))
-    }
-    step.value = 1
-    txHash.value = recipient.hash
-  } catch (err:Error) {
-    console.log(err)
-    error.value = err
-  }
-  disabled.value = false
-}
 const copyHandler = (vaultAddress:string) => {
   address.value = vaultAddress
   copy(vaultAddress)
   if (copied) return Toast.success('copied!')
-}
-
-const clickNavBar = () => {
-  disabled.value = false
-  step.value = 0
-  error.value = ''
-  error.value = ''
-  showCreateVault.value = false
-  if (step.value === 1) {
-    getVaults()
-  }
 }
 
 const select = (address:string) => {
@@ -96,32 +63,28 @@ const select = (address:string) => {
   store.commit('switchAddress', address)
 }
 
-const settingPermission = async () => {
-  showSettingPermission.value = true
-  const { account, signer } = await getEthers()
-  const privateKey = process.env.VUE_APP_PRIVATE_KEY as string
-  const thirdPartyAddress = '0x3456097b1012df324f37db58F2Ad08Ac62c69064'
-  const permissions = {
-    TRANSFERVALUE: true,
-    SETDATA: true,
-    DEPLOY: true
-  }
-  const t = await setKMPermission({
-    account,
-    signer,
-    privateKey,
-    thirdPartyAddress,
-    permissions
-  })
-  // const t2 = await setVaultPermission(account, store.state.currentAddress, signer, privateKey, thirdPartyAddress)
-
-  console.log(t)
+const openDialog = (type:string) => {
+  showDialog.value = true
+  disabled.value = true
+  const componentType = type === 'CreateVault' ? CreateVault : SetPermission
+  component.value = componentType
 }
+
+const close = async (step:number) => {
+  disabled.value = false
+  showDialog.value = false
+  if (component.value === CreateVault) {
+    if (step === 1) {
+      await getVaults()
+    }
+  }
+}
+
 </script>
 
 <template>
   <div class="flex m-3">
-    <van-button @click="createVault" :disabled="disabled">CREATE VAULT</van-button>
+    <van-button @click="openDialog('CreateVault')" :disabled="disabled">CREATE VAULT</van-button>
   </div>
 
   <NoticeBar color="#fff" background="#363636" wrapable  left-icon="info-o" v-if="!isL16Network">
@@ -142,50 +105,15 @@ const settingPermission = async () => {
         </template>
         <template #right-icon>
           <van-radio :name="vault"  @click="select(vault)"/>
-          <van-icon name="setting-o" size="24" class="ml-3 cursor-pointer" @click="settingPermission"/>
+          <van-icon name="setting-o" size="24" class="cursor-pointer ml-3" @click="openDialog('SetPermission')"/>
         </template>
       </van-cell>
     </van-cell-group>
   </van-radio-group>
 
-  <DialogComponent v-model:show="showCreateVault" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
+  <DialogComponent v-model:show="showDialog" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
     class="h-full max-w-screen-md !bg-light !rounded-none">
-    <div class="text-primary">
-      <van-nav-bar title="Create Own Vault" left-arrow @click-left="clickNavBar" />
-      <van-steps :active="step" active-icon="success" class="my-2">
-        <van-step>Creating</van-step>
-        <van-step>🎉 Success</van-step>
-      </van-steps>
-      <div v-if="step == 0">
-        Need three times transactions , please be patient!
-      </div>
-      <div v-if="step == 1" class="break-words">
-      🎉 Success: tx hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${txHash}`" target="_blank">{{
-            txHash
-        }}</a>
-      </div>
-      <p v-if="error" class="text-[red]">{{ error }}</p>
-    </div>
-  </DialogComponent>
-
-  <DialogComponent v-model:show="showSettingPermission" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
-    class="h-full max-w-screen-md !bg-light !rounded-none">
-    <div class="text-primary">
-      <van-nav-bar title="Setting Permission" left-arrow @click-left="clickNavBar" />
-      <van-steps :active="step" active-icon="success" class="my-2">
-        <van-step>Creating</van-step>
-        <van-step>🎉 Success</van-step>
-      </van-steps>
-      <div v-if="step == 0">
-        Need three times transactions , please be patient!
-      </div>
-      <div v-if="step == 1" class="break-words">
-      🎉 Success: tx hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${txHash}`" target="_blank">{{
-            txHash
-        }}</a>
-      </div>
-      <p v-if="error" class="text-[red]">{{ error }}</p>
-    </div>
+    <component :is="component" @close="close" ></component>
   </DialogComponent>
 </template>
 <style scoped>
