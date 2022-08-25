@@ -8,6 +8,7 @@ import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProf
 import LSP6KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
 import LSP6Schema from '@erc725/erc725.js/schemas/LSP6KeyManager.json'
 import { ERC725, ERC725JSONSchema } from '@erc725/erc725.js'
+import { ExternalProvider, Provider } from '@ethersproject/providers'
 
 interface ExecuteByKMParameter{
   account:string
@@ -123,6 +124,41 @@ export const executeByKM = async ({ account, signer, executePayload, privateKey 
   return recipient
 }
 
+export const getPermission = async (account:string, provider:ExternalProvider, thirdPartyAddress:string) => {
+  const erc725 = new ERC725(LSP6Schema as ERC725JSONSchema[], thirdPartyAddress, provider)
+  // const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
+  // const result = await myUP['getData(bytes32)'](thirdPartyAddress, {
+  //   gasLimit: 300_0000
+  // })
+  console.log(thirdPartyAddress)
+  const result = await erc725.getData('AddressPermissions[]')
+  if (result.value) result.value = [...result.value as string[]]
+  for (let ii = 0; ii < result.value.length; ii++) {
+    const address = result.value[ii]
+
+    // step 3.1 - get the permissions of each address
+    const addressPermission = await erc725.getData({
+      keyName: 'AddressPermissions:Permissions:<address>',
+      dynamicKeyParts: address
+    })
+    // step 3.2 - decode the permission of each address
+    const decodedPermission = erc725.decodePermissions(addressPermission.value as string)
+
+    // we use JSON.stringify to display the permission in a readable format
+    console.log(
+      `decoded permission for ${address} = ` +
+        JSON.stringify(decodedPermission, null, 2)
+    )
+  }
+  // const result = await erc725.getData({
+  //   keyName: 'AddressPermissions:Permissions:<address>',
+  //   dynamicKeyParts: thirdPartyAddress
+  // })
+  console.log(result)
+
+  // console.log(`The beneficiary address ${thirdPartyAddress} has now the following permissions:`, erc725.decodePermissions(result))
+}
+
 export const setKMPermission = async ({ account, signer, privateKey, thirdPartyAddress, permissions }:KMPermission) => {
   const erc725 = new ERC725(LSP6Schema as ERC725JSONSchema[])
   const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
@@ -146,7 +182,7 @@ export const setVaultPermission = async (account:string, myVaultAddress:string, 
   const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
   const allowedAddressesDataKey = ERC725YKeys.LSP6['AddressPermissions:AllowedAddresses'] + thirdPartyAddress.substring(2)
   const abiCoder = new ethers.utils.AbiCoder()
-  const arrayOfAddresses = abiCoder.encode(['address'], [myVaultAddress])
+  const arrayOfAddresses = abiCoder.encode(['address[]'], [[myVaultAddress]])
   const setDataPayload = await myUP.interface.encodeFunctionData('setData(bytes32,bytes)', [allowedAddressesDataKey, arrayOfAddresses])
   const recipient = await executeByKM({
     account,

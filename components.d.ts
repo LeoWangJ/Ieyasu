@@ -7,6 +7,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    CreateVault: typeof import('./src/components/vaults/CreateVault.vue')['default']
     LegacyLSPAssets: typeof import('./src/components/received/LegacyLSPAssets.vue')['default']
     LSP10Vault: typeof import('./src/components/vaults/LSP10Vault.vue')['default']
     LSP12CreatedAssets: typeof import('./src/components/created/LSP12CreatedAssets.vue')['default']
@@ -18,6 +19,7 @@ declare module '@vue/runtime-core' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SendAssets: typeof import('./src/components/received/SendAssets.vue')['default']
+    SetPermission: typeof import('./src/components/permission/SetPermission.vue')['default']
     TokenAssets: typeof import('./src/components/TokenAssets.vue')['default']
     VanButton: typeof import('vant/es')['Button']
     VanCell: typeof import('vant/es')['Cell']

@@ -1,39 +1,58 @@
 <script setup lang="ts">
-import { setKMPermission, setVaultPermission } from '@/composables/createEOA'
+import { getPermission, setKMPermission, setVaultPermission } from '@/composables/createEOA'
 import { getEthers } from '@/composables/ethers'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
-import { ref } from 'vue'
+import { onMounted, ref, useAttrs } from 'vue'
+import { useStore } from 'vuex'
+const store = useStore()
 
+const attr = useAttrs()
+
+const emit = defineEmits(['close'])
 const error = ref('')
 const step = ref(0)
 const txHash = ref('')
 const showCreateVault = ref(false)
 
+onMounted(async () => {
+  await getAddressPermission()
+})
+const getAddressPermission = async () => {
+  console.log(' props.address:', attr.address)
+  const { account, signer, ethereumProvider, provider } = await getEthers()
+  await getPermission(account, provider, attr.address)
+}
+
 const settingPermission = async () => {
   const { account, signer } = await getEthers()
   const privateKey = process.env.VUE_APP_PRIVATE_KEY as string
-  const thirdPartyAddress = '0x3456097b1012df324f37db58F2Ad08Ac62c69064'
+  const thirdPartyAddress = '0x5481a9AAC94975B22A269229Fd717651647E303f'
   const permissions = {
     TRANSFERVALUE: true,
     SETDATA: true,
-    DEPLOY: true
+    DEPLOY: false,
+    CALL: true
   }
-  const t = await setKMPermission({
+  const result = await setKMPermission({
     account,
     signer,
     privateKey,
     thirdPartyAddress,
     permissions
   })
-  // const t2 = await setVaultPermission(account, store.state.currentAddress, signer, privateKey, thirdPartyAddress)
-
-  console.log(t)
+  txHash.value = result.hash
+}
+const settingVaultPermission = async () => {
+  const { account, signer } = await getEthers()
+  const privateKey = process.env.VUE_APP_PRIVATE_KEY as string
+  const thirdPartyAddress = '0x5481a9AAC94975B22A269229Fd717651647E303f'
+  const result = await setVaultPermission(account, attr.address as string, signer, privateKey, thirdPartyAddress)
+  txHash.value = result.hash
 }
 const clickNavBar = () => {
+  emit('close', step.value)
   step.value = 0
   error.value = ''
-  error.value = ''
-  showCreateVault.value = false
 }
 </script>
 

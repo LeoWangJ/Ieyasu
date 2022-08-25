@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, shallowRef } from 'vue'
+import { computed, onMounted, ref, shallowRef } from 'vue'
 import type { Component } from 'vue'
 // import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import { getEthers } from '@/composables/ethers'
@@ -8,7 +8,6 @@ import { useClipboard } from '@vueuse/core'
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { useStore } from 'vuex'
 import CreateVault from './CreateVault.vue'
-import SetPermission from './SetPermission.vue'
 const store = useStore()
 
 const disabled = ref(false)
@@ -17,10 +16,9 @@ const address = ref('')
 const isL16Network = ref(true)
 const showDialog = ref(false)
 const DialogComponent = Dialog.Component
-const component:Component = shallowRef(undefined)
 
 const { copy, copied } = useClipboard({ source: address })
-
+const cantCreateVault = computed(() => store.state.currentAddress !== store.state.account)
 onMounted(async () => {
   await getVaults()
   await checkNetwork()
@@ -30,26 +28,11 @@ const checkNetwork = async () => {
   isL16Network.value = await isLuksoNetwork()
 }
 
+// TODO: LSP10Vaults always empty..
 const getVaults = async () => {
   const { account } = await getEthers()
-
   const LSP10Vaults = JSON.parse(localStorage.getItem('vaults') as string)
-  console.log('LSP10Vaults:', JSON.parse(localStorage.getItem('vaults') as string))
-
   vaults.value = [account, ...LSP10Vaults.value]
-  // TODO: LSP10Vaults always empty..
-  // const { provider, account } = await getEthers()
-  // const controller = new ERC725(LSP10ReceivedVaultsSchema as ERC725JSONSchema[], account, provider)
-  // try {
-  //   const LSP10Vaults = await controller.fetchData([
-  //     'LSP10Vaults[]'
-  //   ])
-  //   vaults.value = LSP10Vaults[0].value
-  // } catch (e) {
-  //   const LSP10Vaults = JSON.parse(localStorage.getItem('vaults') as string)
-  //   vaults.value = LSP10Vaults.value
-  // }
-  console.log('LSP10Vaults:', vaults.value)
 }
 
 const copyHandler = (vaultAddress:string) => {
@@ -63,20 +46,16 @@ const select = (address:string) => {
   store.commit('switchAddress', address)
 }
 
-const openDialog = (type:string) => {
+const open = () => {
   showDialog.value = true
   disabled.value = true
-  const componentType = type === 'CreateVault' ? CreateVault : SetPermission
-  component.value = componentType
 }
 
 const close = async (step:number) => {
   disabled.value = false
   showDialog.value = false
-  if (component.value === CreateVault) {
-    if (step === 1) {
-      await getVaults()
-    }
+  if (step === 1) {
+    await getVaults()
   }
 }
 
@@ -84,7 +63,7 @@ const close = async (step:number) => {
 
 <template>
   <div class="flex m-3">
-    <van-button @click="openDialog('CreateVault')" :disabled="disabled">CREATE VAULT</van-button>
+    <van-button @click="open" :disabled="disabled || cantCreateVault">CREATE VAULT</van-button>
   </div>
 
   <NoticeBar color="#fff" background="#363636" wrapable  left-icon="info-o" v-if="!isL16Network">
@@ -105,7 +84,6 @@ const close = async (step:number) => {
         </template>
         <template #right-icon>
           <van-radio :name="vault"  @click="select(vault)"/>
-          <van-icon name="setting-o" size="24" class="cursor-pointer ml-3" @click="openDialog('SetPermission')"/>
         </template>
       </van-cell>
     </van-cell-group>
@@ -113,7 +91,7 @@ const close = async (step:number) => {
 
   <DialogComponent v-model:show="showDialog" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
     class="h-full max-w-screen-md !bg-light !rounded-none">
-    <component :is="component" @close="close" ></component>
+    <CreateVault  @close="close" v-if="showDialog" ></CreateVault>
   </DialogComponent>
 </template>
 <style scoped>

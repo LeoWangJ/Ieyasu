@@ -7,14 +7,14 @@ import { settingURDAddressInStorage } from '@/composables/createEOA'
 const error = ref('')
 const step = ref(0)
 const txHash = ref('')
-const showCreateVault = ref(false)
 
+const emit = defineEmits(['close'])
 onMounted(async () => {
+  console.log(1)
   await createVault()
 })
 
 const createVault = async () => {
-  showCreateVault.value = true
   const { account, signer } = await getEthers()
   try {
     const recipient = await settingURDAddressInStorage(account, signer, process.env.VUE_APP_PRIVATE_KEY as string)
@@ -32,10 +32,9 @@ const createVault = async () => {
 }
 
 const clickNavBar = () => {
+  emit('close', step.value)
   step.value = 0
   error.value = ''
-  error.value = ''
-  showCreateVault.value = false
 }
 
 </script>
