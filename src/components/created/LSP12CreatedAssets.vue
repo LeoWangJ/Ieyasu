@@ -7,7 +7,7 @@ import { ethers } from 'ethers'
 import { computed, onMounted, ref, watch } from 'vue'
 import TokenAssets from '@/components/TokenAssets.vue'
 import NFTAssets from '@/components/NFTAssets.vue'
-import { Button } from 'vant'
+import { Button, NoticeBar } from 'vant'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 const store = useStore()
@@ -71,8 +71,8 @@ const getCreateAssets = async () => {
 
 <template>
   <div class="flex m-3">
-    <Button class="!mr-3" @click="router.push({name: 'createToken'})">CREATE TOKEN</Button>
-    <Button @click="router.push({name: 'createNFTToken'})">CREATE NFT</Button>
+    <Button class="!mr-3" @click="router.push({name: 'createToken'})" :disabled="store.state.isVault">CREATE TOKEN</Button>
+    <Button @click="router.push({name: 'createNFTToken'})" :disabled="store.state.isVault">CREATE NFT</Button>
   </div>
   <div v-if="receivedTokens.length">
     <p class="m-2 text-primary">TOKENs</p>
@@ -91,6 +91,11 @@ const getCreateAssets = async () => {
       :address="address"
       :key="index">
     </NFTAssets>
+  </div>
+  <div v-if="store.state.isVault" class="m-2 text-[red]">
+    <NoticeBar color="#fff" background="#363636" wrapable  left-icon="info-o">
+      <p>Currently only provided only owner addres for create and mint token </p>
+    </NoticeBar>
   </div>
 </template>
 <style scoped>

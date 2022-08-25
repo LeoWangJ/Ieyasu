@@ -8,7 +8,8 @@ import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { ethers } from 'ethers'
 import { Toast, NoticeBar } from 'vant'
 import { handlerIPFSImg } from '@/utils'
-
+import { useStore } from 'vuex'
+const store = useStore()
 const props = defineProps<{
   show: boolean,
   assets: NFT
@@ -20,6 +21,7 @@ const error = ref('')
 const step = ref(0)
 const isMinterEOA = ref(false)
 const mintAmount = ref(0)
+const mintAddress = ref(store.state.account)
 const txHash = ref('')
 const emit = defineEmits(['update:show'])
 
@@ -49,7 +51,7 @@ const mint = async () => {
   const amount = ethers.utils.parseEther(`${mintAmount.value}`)
   try {
     const LSP7DigitalAssetContract = new ethers.Contract(props.assets.address, LSP7DigitalAsset.abi, signer)
-    const receipt = await LSP7DigitalAssetContract.mint(account, amount.toString(), isMinterEOA.value, '0x')
+    const receipt = await LSP7DigitalAssetContract.mint(mintAddress.value, amount.toString(), isMinterEOA.value, '0x')
     txHash.value = receipt.hash
     if (isEOAccount) {
       const LSP5ReceivedAssets = JSON.parse(localStorage.getItem('receivedAssets') as string)
@@ -112,6 +114,7 @@ const clickNavBar = () => {
         ></van-image>
       </div>
       <van-field v-model.number="mintAmount" placeholder="mint amount" number label="Mint Amount" />
+      <van-field v-model="mintAddress" placeholder="mint address" number label="Mint Address" />
       <div class="flex m-3 justify-center">
         <van-button  @click="mint" :disabled="disabled">MINT TOKEN</van-button>
       </div>
