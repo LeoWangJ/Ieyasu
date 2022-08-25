@@ -14,15 +14,6 @@ const step = ref(0)
 const txHash = ref('')
 const showCreateVault = ref(false)
 
-onMounted(async () => {
-  await getAddressPermission()
-})
-const getAddressPermission = async () => {
-  console.log(' props.address:', attr.address)
-  const { account, signer, ethereumProvider, provider } = await getEthers()
-  await getPermission(account, provider, attr.address)
-}
-
 const settingPermission = async () => {
   const { account, signer } = await getEthers()
   const privateKey = process.env.VUE_APP_PRIVATE_KEY as string

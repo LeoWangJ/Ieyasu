@@ -124,13 +124,12 @@ export const executeByKM = async ({ account, signer, executePayload, privateKey 
   return recipient
 }
 
-export const getPermission = async (account:string, provider:ExternalProvider, thirdPartyAddress:string) => {
-  const erc725 = new ERC725(LSP6Schema as ERC725JSONSchema[], thirdPartyAddress, provider)
+export const getPermission = async (account:string, provider:ExternalProvider) => {
+  const erc725 = new ERC725(LSP6Schema as ERC725JSONSchema[], account, provider)
   // const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
   // const result = await myUP['getData(bytes32)'](thirdPartyAddress, {
   //   gasLimit: 300_0000
   // })
-  console.log(thirdPartyAddress)
   const result = await erc725.getData('AddressPermissions[]')
   if (result.value) result.value = [...result.value as string[]]
   for (let ii = 0; ii < result.value.length; ii++) {
@@ -155,7 +154,7 @@ export const getPermission = async (account:string, provider:ExternalProvider, t
   //   dynamicKeyParts: thirdPartyAddress
   // })
   console.log(result)
-
+  return result
   // console.log(`The beneficiary address ${thirdPartyAddress} has now the following permissions:`, erc725.decodePermissions(result))
 }
 

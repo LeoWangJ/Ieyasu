@@ -7,6 +7,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    ControllerList: typeof import('./src/components/permission/ControllerList.vue')['default']
     CreateVault: typeof import('./src/components/vaults/CreateVault.vue')['default']
     LegacyLSPAssets: typeof import('./src/components/received/LegacyLSPAssets.vue')['default']
     LSP10Vault: typeof import('./src/components/vaults/LSP10Vault.vue')['default']
