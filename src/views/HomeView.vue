@@ -64,12 +64,20 @@ const clearLocalStorage = (itemName:string) => {
 </script>
 
 <template>
-  <ProfileInfo ></ProfileInfo>
-  <Tabs v-model:active="active" animated clsss="tabs" lazy-render swipeable>
-    <Tab v-for="item in tabs" :title="item.name" :key="item.id">
-      <component :is="item.component" :key="item.id"></component>
-    </Tab>
-  </Tabs>
+  <div class="relative min-h-screen">
+    <div class="relative z-1 pb-3">
+      <ProfileInfo ></ProfileInfo>
+      <Tabs v-model:active="active" animated clsss="tabs" lazy-render swipeable>
+        <Tab v-for="item in tabs" :title="item.name" :key="item.id">
+          <component :is="item.component" :key="item.id"></component>
+        </Tab>
+
+      </Tabs>
+    </div>
+    <div class="absolute top-7/10 left-1/2 transform -translate-x-1/2">
+      <img src="@/assets/logo.png" />
+    </div>
+  </div>
 </template>
 <style scoped>
 :deep(.van-tab) {
