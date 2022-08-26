@@ -35,7 +35,7 @@ const getVaults = async () => {
   loading.value = true
   const { account } = await getEthers()
   const LSP10Vaults = JSON.parse(localStorage.getItem('vaults') as string)
-  vaults.value = [account, ...LSP10Vaults.value]
+  vaults.value = LSP10Vaults.value ? [account, ...LSP10Vaults.value] : [account]
   loading.value = false
 }
 
@@ -58,7 +58,7 @@ const open = () => {
 const close = async (step:number) => {
   disabled.value = false
   showDialog.value = false
-  if (step === 1) {
+  if (step === 2) {
     await getVaults()
   }
 }
@@ -76,7 +76,7 @@ const close = async (step:number) => {
       </span>to send this token.
     </p>
   </NoticeBar>
-  <div v-if="vaults.length">
+  <div v-if="vaults.length && !loading">
     <p class="m-2 text-primary">OWNER & VAULTs</p>
     <van-radio-group v-model="store.state.currentAddress" checked-color="var(--color-theme)">
       <van-cell-group>
@@ -128,25 +128,6 @@ const close = async (step:number) => {
 
 :deep(.van-cell__left-icon) {
   font-size: 30px;
-}
-
-:deep(.van-nav-bar){
-  --van-nav-bar-background-color:var(--color-bg-secondary);
-  --van-nav-bar-title-text-color:var(--color-text-primary);
-  --van-nav-bar-icon-color:var(--color-text-primary);
-}
-:deep(.van-hairline--bottom:after){
-  border-width: 0;
-}
-:deep(.van-steps){
-  --van-step-text-color:var(--color-text-primary);
-  --van-step-active-color:var(--color-theme);
-  --van-step-process-text-color:var(--color-text-primary);
-  --van-step-line-color:var(--color-text-primary);
-  --van-step-finish-line-color:var(--color-theme);
-  --van-step-finish-text-color:var(--color-text-primary);
-  --van-steps-background-color:var(--color-bg-secondary);
-  --van-background-color-light:var(--color-bg-secondary)
 }
 
 :deep(.van-cell-group){

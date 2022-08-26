@@ -31,6 +31,7 @@ const recipientAddress = ref('')
 const isRecipientEOA = ref(false)
 const txHash = ref('')
 const sendAmount = ref(0)
+const privateKey = ref('')
 
 onMounted(async () => {
   await checkNetwork()
@@ -97,7 +98,7 @@ const sendLSP7Token = async (fromAddress: string, signer: Signer) => {
       account,
       signer,
       executePayload,
-      privateKey: process.env.VUE_APP_PRIVATE_KEY as string
+      privateKey: privateKey.value
     })
     txHash.value = receipt.hash
   } else {
@@ -122,7 +123,7 @@ const sendLSP8Token = async (fromAddress: string, signer: Signer) => {
       account,
       signer,
       executePayload,
-      privateKey: process.env.VUE_APP_PRIVATE_KEY as string
+      privateKey: privateKey.value
     })
     txHash.value = receipt.hash
   } else {
@@ -178,6 +179,7 @@ const clickNavBar = () => {
       </div>
       <van-field v-model="recipientAddress" placeholder="0x..." label="Recipient Address" />
       <van-field v-if="!assets.isNFT" v-model.number="sendAmount" label="Amount To Send" />
+      <van-field v-if="store.state.isVault" v-model="privateKey" placeholder="Private Key is only used to execute the contract, and the DAPP will not steal" label="Private Key" />
       <div class="flex m-3 justify-center">
         <van-button @click="send" :disabled="disabled">TRANSFER</van-button>
       </div>

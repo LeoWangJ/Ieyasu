@@ -78,30 +78,32 @@ const getCreateAssets = async () => {
     <Button class="!mr-3" @click="router.push({name: 'createToken'})" :disabled="store.state.isVault">CREATE TOKEN</Button>
     <Button @click="router.push({name: 'createNFTToken'})" :disabled="store.state.isVault">CREATE NFT</Button>
   </div>
-  <LoadingAnimate v-if="loading"></LoadingAnimate>
-  <div v-if="receivedTokens.length">
-    <p class="m-2 text-primary">TOKENs</p>
-    <TokenAssets
-      :location="LOCATION.created"
-      v-for="(address,index) in receivedTokens"
-      :address="address"
-      :key="index">
-    </TokenAssets>
-  </div>
-  <div v-if="receivedNFTTokens.length">
-    <p class="m-2 text-primary">NFTs</p>
-    <NFTAssets
-      :location="LOCATION.created"
-      v-for="(address,index) in receivedNFTTokens"
-      :address="address"
-      :key="index">
-    </NFTAssets>
-  </div>
   <div v-if="store.state.isVault" class="m-2 text-[red]">
     <NoticeBar color="#fff" background="#363636" wrapable  left-icon="info-o">
       <p>Currently only provided only owner addres for create and mint token </p>
     </NoticeBar>
   </div>
+  <LoadingAnimate v-if="loading"></LoadingAnimate>
+  <template v-else>
+    <div v-if="receivedTokens.length">
+      <p class="m-2 text-primary">TOKENs</p>
+      <TokenAssets
+        :location="LOCATION.created"
+        v-for="(address,index) in receivedTokens"
+        :address="address"
+        :key="index">
+      </TokenAssets>
+    </div>
+    <div v-if="receivedNFTTokens.length">
+      <p class="m-2 text-primary">NFTs</p>
+      <NFTAssets
+        :location="LOCATION.created"
+        v-for="(address,index) in receivedNFTTokens"
+        :address="address"
+        :key="index">
+      </NFTAssets>
+    </div>
+  </template>
 </template>
 <style scoped>
 :deep(.van-button){

@@ -43,7 +43,7 @@ const copyHandler = (permissionAddress:string) => {
     <Button class="!mr-3" @click="grantPermission" :disabled="store.state.isVault">Grant Permission</Button>
   </div>
   <LoadingAnimate v-if="loading"></LoadingAnimate>
-  <div v-if="permissionList.length">
+  <div v-if="permissionList.length && !loading">
     <p class="m-2 text-primary">Controllers</p>
     <van-cell v-for="(address) in permissionList" is-link :key="address" size="large" center class="cell truncate" >
       <template #title>

@@ -94,25 +94,27 @@ const closeLegacy = async () => {
     <van-button @click="showLegacy = true">FIND LEGACY ASSETS</van-button>
   </div>
   <LoadingAnimate v-if="loading"></LoadingAnimate>
-  <div v-if="receivedTokens.length">
-    <p class="m-2 text-primary">TOKENs</p>
-    <TokenAssets
-      :location="LOCATION.received"
-      :address="item.address"
-      v-for="(item,index) in receivedTokens"
-      :key="index">
-    </TokenAssets>
-  </div>
-  <div v-if="receivedNFTTokens.length">
-    <p class="m-2 text-primary">NFTs</p>
-    <NFTAssets
-      :location="LOCATION.received"
-      :address="item.address"
-      :tokenId="item.tokenId"
-      v-for="(item,index) in receivedNFTTokens"
-      :key="index">
-    </NFTAssets>
-  </div>
+  <template v-else>
+    <div v-if="receivedTokens.length">
+      <p class="m-2 text-primary">TOKENs</p>
+      <TokenAssets
+        :location="LOCATION.received"
+        :address="item.address"
+        v-for="(item,index) in receivedTokens"
+        :key="index">
+      </TokenAssets>
+    </div>
+    <div v-if="receivedNFTTokens.length">
+      <p class="m-2 text-primary">NFTs</p>
+      <NFTAssets
+        :location="LOCATION.received"
+        :address="item.address"
+        :tokenId="item.tokenId"
+        v-for="(item,index) in receivedNFTTokens"
+        :key="index">
+      </NFTAssets>
+    </div>
+  </template>
   <DialogComponent v-model:show="showLegacy" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
     class="h-full max-w-screen-md !bg-light !rounded-none">
     <LegacyLSPAssets @close="closeLegacy"></LegacyLSPAssets>
