@@ -50,7 +50,7 @@ const clickNavBar = () => {
       <van-step>🎉 Success</van-step>
     </van-steps>
     <div v-if="step == 0" class="mt-2">
-      <van-field v-model="privateKey" placeholder="Private Key is only used to execute the contract, and the DAPP will not steal" label="Private Key" />
+      <van-field v-model="privateKey" placeholder="Only used to execute the contract" label="Private Key" />
       <div class="flex m-3 justify-center">
         <van-button  @click="createVault" :disabled="disabled">CREATE VAULT</van-button>
       </div>

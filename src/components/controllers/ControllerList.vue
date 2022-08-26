@@ -5,7 +5,7 @@ import { onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { Button, Toast, Dialog } from 'vant'
 import { useClipboard } from '@vueuse/core'
-import SetPermission from './SetPermission.vue'
+import GrantPermission from './GrantPermission.vue'
 import LoadingAnimate from '../LoadingAnimate.vue'
 const DialogComponent = Dialog.Component
 
@@ -28,7 +28,14 @@ const getAddressPermission = async () => {
 }
 
 const grantPermission = () => {
-  console.log('open')
+  showDialog.value = true
+}
+
+const close = async (step:number) => {
+  showDialog.value = false
+  if (step === 2) {
+    await getAddressPermission()
+  }
 }
 
 const copyHandler = (permissionAddress:string) => {
@@ -56,7 +63,7 @@ const copyHandler = (permissionAddress:string) => {
   </div>
   <DialogComponent v-model:show="showDialog" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
     class="h-full max-w-screen-md !bg-light !rounded-none">
-    <SetPermission></SetPermission>
+    <GrantPermission @close="close"></GrantPermission>
   </DialogComponent>
 </template>
 <style scoped>

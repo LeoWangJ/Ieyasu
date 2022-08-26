@@ -10,6 +10,7 @@ declare module '@vue/runtime-core' {
     BalanceOf: typeof import('./src/components/BalanceOf.vue')['default']
     ControllerList: typeof import('./src/components/controllers/ControllerList.vue')['default']
     CreateVault: typeof import('./src/components/vaults/CreateVault.vue')['default']
+    GrantPermission: typeof import('./src/components/controllers/GrantPermission.vue')['default']
     LegacyLSPAssets: typeof import('./src/components/received/LegacyLSPAssets.vue')['default']
     LoadingAnimate: typeof import('./src/components/LoadingAnimate.vue')['default']
     LSP10Vault: typeof import('./src/components/vaults/LSP10Vault.vue')['default']
@@ -22,7 +23,6 @@ declare module '@vue/runtime-core' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SendAssets: typeof import('./src/components/received/SendAssets.vue')['default']
-    SetPermission: typeof import('./src/components/controllers/SetPermission.vue')['default']
     TokenAssets: typeof import('./src/components/TokenAssets.vue')['default']
     VanButton: typeof import('vant/es')['Button']
     VanCell: typeof import('vant/es')['Cell']
@@ -35,6 +35,7 @@ declare module '@vue/runtime-core' {
     VanRadioGroup: typeof import('vant/es')['RadioGroup']
     VanStep: typeof import('vant/es')['Step']
     VanSteps: typeof import('vant/es')['Steps']
+    VanSwitch: typeof import('vant/es')['Switch']
     VanTag: typeof import('vant/es')['Tag']
     VanUploader: typeof import('vant/es')['Uploader']
   }

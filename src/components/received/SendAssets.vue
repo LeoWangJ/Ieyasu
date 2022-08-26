@@ -179,7 +179,7 @@ const clickNavBar = () => {
       </div>
       <van-field v-model="recipientAddress" placeholder="0x..." label="Recipient Address" />
       <van-field v-if="!assets.isNFT" v-model.number="sendAmount" label="Amount To Send" />
-      <van-field v-if="store.state.isVault" v-model="privateKey" placeholder="Private Key is only used to execute the contract, and the DAPP will not steal" label="Private Key" />
+      <van-field v-if="store.state.isVault" v-model="privateKey" placeholder="Only used to execute the contract" label="Private Key" />
       <div class="flex m-3 justify-center">
         <van-button @click="send" :disabled="disabled">TRANSFER</van-button>
       </div>
