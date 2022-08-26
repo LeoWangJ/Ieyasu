@@ -8,6 +8,7 @@ import { useClipboard } from '@vueuse/core'
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { useStore } from 'vuex'
 import CreateVault from './CreateVault.vue'
+import LoadingAnimate from '../LoadingAnimate.vue'
 const store = useStore()
 
 const disabled = ref(false)
@@ -15,6 +16,7 @@ const vaults = ref<string[]>([])
 const address = ref('')
 const isL16Network = ref(true)
 const showDialog = ref(false)
+const loading = ref(true)
 const DialogComponent = Dialog.Component
 
 const { copy, copied } = useClipboard({ source: address })
@@ -30,9 +32,11 @@ const checkNetwork = async () => {
 
 // TODO: LSP10Vaults always empty..
 const getVaults = async () => {
+  loading.value = true
   const { account } = await getEthers()
   const LSP10Vaults = JSON.parse(localStorage.getItem('vaults') as string)
   vaults.value = [account, ...LSP10Vaults.value]
+  loading.value = false
 }
 
 const copyHandler = (vaultAddress:string) => {
@@ -65,29 +69,31 @@ const close = async (step:number) => {
   <div class="flex m-3">
     <van-button @click="open" :disabled="disabled || cantCreateVault">CREATE VAULT</van-button>
   </div>
-
+  <LoadingAnimate v-if="loading"></LoadingAnimate>
   <NoticeBar color="#fff" background="#363636" wrapable  left-icon="info-o" v-if="!isL16Network">
     <p>
       Please switch your network to LUKSO <span class="cursor-pointer text-theme" @click="addLuksoL16Testnet">L16
       </span>to send this token.
     </p>
   </NoticeBar>
-  <p class="m-2 text-primary">OWNER & VAULTs</p>
-  <van-radio-group v-model="store.state.currentAddress" checked-color="var(--color-theme)">
-    <van-cell-group>
-      <van-cell v-for="(vault,index) in vaults" :key="vault" size="large" center class="cell truncate" >
-        <template #title>
-          <div class="text-shadow-lg">
-          {{ `${vault.slice(0,8)}...${vault.slice(-6)}` }} <van-tag class="mr-1" v-if="index === 0">vaults owner</van-tag>
-          <van-icon name="link-o" @click="copyHandler(vault)" class="cursor-pointer"/>
-          </div>
-        </template>
-        <template #right-icon>
-          <van-radio :name="vault"  @click="select(vault)"/>
-        </template>
-      </van-cell>
-    </van-cell-group>
-  </van-radio-group>
+  <div v-if="vaults.length">
+    <p class="m-2 text-primary">OWNER & VAULTs</p>
+    <van-radio-group v-model="store.state.currentAddress" checked-color="var(--color-theme)">
+      <van-cell-group>
+        <van-cell v-for="(vault,index) in vaults" :key="vault" size="large" center class="cell truncate" >
+          <template #title>
+            <div class="text-shadow-lg">
+            {{ `${vault.slice(0,8)}...${vault.slice(-6)}` }} <van-tag class="mr-1" v-if="index === 0">vaults owner</van-tag>
+            <van-icon name="link-o" @click="copyHandler(vault)" class="cursor-pointer"/>
+            </div>
+          </template>
+          <template #right-icon>
+            <van-radio :name="vault"  @click="select(vault)"/>
+          </template>
+        </van-cell>
+      </van-cell-group>
+    </van-radio-group>
+  </div>
 
   <DialogComponent v-model:show="showDialog" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
     class="h-full max-w-screen-md !bg-light !rounded-none">
@@ -141,5 +147,9 @@ const close = async (step:number) => {
   --van-step-finish-text-color:var(--color-text-primary);
   --van-steps-background-color:var(--color-bg-secondary);
   --van-background-color-light:var(--color-bg-secondary)
+}
+
+:deep(.van-cell-group){
+  --van-cell-group-background-color:var(--color-bg-secondary);
 }
 </style>

@@ -10,12 +10,14 @@ import NFTAssets from '@/components/NFTAssets.vue'
 import { Button, NoticeBar } from 'vant'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import LoadingAnimate from '../LoadingAnimate.vue'
 const store = useStore()
 
 const router = useRouter()
 const receivedAssets = ref<string[]>([])
 const receivedTokens = ref<string[]>([])
 const receivedNFTTokens = ref<string[]>([])
+const loading = ref(true)
 
 const address = computed(() => store.state.currentAddress)
 watch([address], async (now, prev) => {
@@ -30,6 +32,7 @@ onMounted(async () => {
   }
 })
 const getCreateAssets = async () => {
+  loading.value = true
   receivedAssets.value = []
   receivedTokens.value = []
   receivedNFTTokens.value = []
@@ -66,6 +69,7 @@ const getCreateAssets = async () => {
       console.error(`Could not find interface of the contract: ${address}`)
     }
   })
+  loading.value = false
 }
 </script>
 
@@ -74,6 +78,7 @@ const getCreateAssets = async () => {
     <Button class="!mr-3" @click="router.push({name: 'createToken'})" :disabled="store.state.isVault">CREATE TOKEN</Button>
     <Button @click="router.push({name: 'createNFTToken'})" :disabled="store.state.isVault">CREATE NFT</Button>
   </div>
+  <LoadingAnimate v-if="loading"></LoadingAnimate>
   <div v-if="receivedTokens.length">
     <p class="m-2 text-primary">TOKENs</p>
     <TokenAssets

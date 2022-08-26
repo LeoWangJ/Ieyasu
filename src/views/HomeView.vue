@@ -65,9 +65,9 @@ const clearLocalStorage = (itemName:string) => {
 
 <template>
   <ProfileInfo ></ProfileInfo>
-  <Tabs v-model:active="active" animated clsss="tabs">
+  <Tabs v-model:active="active" animated clsss="tabs" lazy-render swipeable>
     <Tab v-for="item in tabs" :title="item.name" :key="item.id">
-      <component :is="item.component"></component>
+      <component :is="item.component" :key="item.id"></component>
     </Tab>
   </Tabs>
 </template>

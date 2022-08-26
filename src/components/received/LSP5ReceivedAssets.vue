@@ -13,12 +13,14 @@ import type { ReceivedTokens } from '@/utils/types'
 import { Dialog } from 'vant'
 import LegacyLSPAssets from './LegacyLSPAssets.vue'
 import { useStore } from 'vuex'
+import LoadingAnimate from '../LoadingAnimate.vue'
 const store = useStore()
 
 const receivedAssets = ref<string[]>([])
 const receivedTokens = ref<ReceivedTokens[]>([])
 const receivedNFTTokens = ref<ReceivedTokens[]>([])
 const showLegacy = ref(false)
+const loading = ref(true)
 const DialogComponent = Dialog.Component
 onMounted(async () => {
   if (store.state.currentAddress) {
@@ -32,6 +34,7 @@ watch([address], async (now, prev) => {
   }
 })
 const getReceivedAssets = async () => {
+  loading.value = true
   const { provider, ethereumProvider } = await getEthers()
   receivedAssets.value = []
   receivedTokens.value = []
@@ -76,6 +79,7 @@ const getReceivedAssets = async () => {
       })
     }
   })
+  loading.value = false
 }
 
 const closeLegacy = async () => {
@@ -89,6 +93,7 @@ const closeLegacy = async () => {
   <div class="flex m-3">
     <van-button @click="showLegacy = true">FIND LEGACY ASSETS</van-button>
   </div>
+  <LoadingAnimate v-if="loading"></LoadingAnimate>
   <div v-if="receivedTokens.length">
     <p class="m-2 text-primary">TOKENs</p>
     <TokenAssets

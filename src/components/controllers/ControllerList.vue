@@ -6,11 +6,12 @@ import { useStore } from 'vuex'
 import { Button, Toast, Dialog } from 'vant'
 import { useClipboard } from '@vueuse/core'
 import SetPermission from './SetPermission.vue'
+import LoadingAnimate from '../LoadingAnimate.vue'
 const DialogComponent = Dialog.Component
 
 const store = useStore()
 const showDialog = ref(false)
-
+const loading = ref(true)
 const permissionList = ref<string[]>([])
 const address = ref('')
 const { copy, copied } = useClipboard({ source: address })
@@ -19,9 +20,11 @@ onMounted(async () => {
   await getAddressPermission()
 })
 const getAddressPermission = async () => {
+  loading.value = true
   const { account, provider } = await getEthers()
   const result = await getPermission(account, provider)
   permissionList.value = result.value as string[]
+  loading.value = false
 }
 
 const grantPermission = () => {
@@ -39,7 +42,8 @@ const copyHandler = (permissionAddress:string) => {
   <div class="flex m-3">
     <Button class="!mr-3" @click="grantPermission" :disabled="store.state.isVault">Grant Permission</Button>
   </div>
-  <div>
+  <LoadingAnimate v-if="loading"></LoadingAnimate>
+  <div v-if="permissionList.length">
     <p class="m-2 text-primary">Controllers</p>
     <van-cell v-for="(address) in permissionList" is-link :key="address" size="large" center class="cell truncate" >
       <template #title>
@@ -70,7 +74,6 @@ const copyHandler = (permissionAddress:string) => {
   --van-cell-value-color: #C6C6C6;
   --van-cell-border-color: var(--color-bg-primary);
 }
-
 :deep(.van-cell) {
   padding-left: 5px;
 }

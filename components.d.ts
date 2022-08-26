@@ -11,6 +11,7 @@ declare module '@vue/runtime-core' {
     ControllerList: typeof import('./src/components/controllers/ControllerList.vue')['default']
     CreateVault: typeof import('./src/components/vaults/CreateVault.vue')['default']
     LegacyLSPAssets: typeof import('./src/components/received/LegacyLSPAssets.vue')['default']
+    LoadingAnimate: typeof import('./src/components/LoadingAnimate.vue')['default']
     LSP10Vault: typeof import('./src/components/vaults/LSP10Vault.vue')['default']
     LSP12CreatedAssets: typeof import('./src/components/created/LSP12CreatedAssets.vue')['default']
     LSP5ReceivedAssets: typeof import('./src/components/received/LSP5ReceivedAssets.vue')['default']
