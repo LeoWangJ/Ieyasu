@@ -8,6 +8,7 @@ import { Tag, Toast } from 'vant'
 import { useClipboard } from '@vueuse/core'
 import { handlerIPFSImg } from '@/utils'
 import { getEthers } from '@/composables/ethers'
+import BalanceOf from './BalanceOf.vue'
 
 interface Image {
   hash:string
@@ -85,6 +86,7 @@ const copyHandler = () => {
         </div>
       </div>
     </div>
+    <BalanceOf></BalanceOf>
   </div>
 </template>
 
