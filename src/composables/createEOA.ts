@@ -97,6 +97,39 @@ export const createURD = async (address:string, signer:Signer) => {
     throw error
   }
 }
+export const addVaultLength = async ({ account, signer, privateKey, length }:AddPermissionLength) => {
+  const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
+  const indexLength = `${length + 1}`.length
+  const btyesLength = ethers.constants.HashZero.slice(0, ethers.constants.HashZero.length - indexLength) + `${length + 1}`
+  const arrayIndexLength = ethers.constants.HashZero.slice(0, ethers.constants.HashZero.length - indexLength) + `${length}`
+  const VaultDataKey = ERC725YKeys.LSP10['LSP10Vaults[]'].length
+  const setDataPayload = await myUP.interface.encodeFunctionData('setData(bytes32,bytes)', [VaultDataKey, btyesLength])
+
+  await executeByKM({
+    account,
+    signer,
+    executePayload: setDataPayload,
+    privateKey
+  })
+  return arrayIndexLength
+}
+
+export const setVaultList = async ({ account, signer, privateKey, thirdPartyAddress, btyesLength }:SetPermissionList) => {
+  const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
+  const VaultIndex = ERC725YKeys.LSP10['LSP10Vaults[]'].index
+  const VaultDataKey = VaultIndex + btyesLength.slice(VaultIndex.length)
+  const setDataPayload = await myUP.interface.encodeFunctionData('setData(bytes32,bytes)', [VaultDataKey, thirdPartyAddress])
+
+  const recipient = await executeByKM({
+    account,
+    signer,
+    executePayload: setDataPayload,
+    privateKey
+  })
+  await recipient.wait()
+  return recipient
+}
+
 export const createMyVault = async (address:string, signer:Signer) => {
   const myVault = new ethers.ContractFactory(LSP9Vault.abi, LSP9Vault.bytecode, signer)
 
@@ -148,6 +181,7 @@ export const addPermissionLength = async ({ account, signer, privateKey, length 
   const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
   const indexLength = `${length + 1}`.length
   const btyesLength = ethers.constants.HashZero.slice(0, ethers.constants.HashZero.length - indexLength) + `${length + 1}`
+  const arrayIndexLength = ethers.constants.HashZero.slice(0, ethers.constants.HashZero.length - indexLength) + `${length}`
   const allowedAddressesDataKey = ERC725YKeys.LSP6['AddressPermissions[]'].length
   const setDataPayload = await myUP.interface.encodeFunctionData('setData(bytes32,bytes)', [allowedAddressesDataKey, btyesLength])
 
@@ -157,7 +191,7 @@ export const addPermissionLength = async ({ account, signer, privateKey, length 
     executePayload: setDataPayload,
     privateKey
   })
-  return btyesLength
+  return arrayIndexLength
 }
 
 export const setPermissionList = async ({ account, signer, privateKey, thirdPartyAddress, btyesLength }:SetPermissionList) => {
@@ -172,6 +206,7 @@ export const setPermissionList = async ({ account, signer, privateKey, thirdPart
     executePayload: setDataPayload,
     privateKey
   })
+  await recipient.wait()
   return recipient
 }
 

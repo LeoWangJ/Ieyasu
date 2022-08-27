@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, shallowRef } from 'vue'
-import type { Component } from 'vue'
-// import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
+import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
+import LSP10ReceivedVaultsSchema from '@erc725/erc725.js/schemas/LSP10ReceivedVaults.json'
 import { getEthers } from '@/composables/ethers'
 import { Dialog, Toast, NoticeBar } from 'vant'
 import { useClipboard } from '@vueuse/core'
@@ -30,12 +30,20 @@ const checkNetwork = async () => {
   isL16Network.value = await isLuksoNetwork()
 }
 
-// TODO: LSP10Vaults always empty..
 const getVaults = async () => {
   loading.value = true
-  const { account } = await getEthers()
-  const LSP10Vaults = JSON.parse(localStorage.getItem('vaults') as string)
-  vaults.value = LSP10Vaults.value ? [account, ...LSP10Vaults.value] : [account]
+  const { provider, account } = await getEthers()
+  const controller = new ERC725(LSP10ReceivedVaultsSchema as ERC725JSONSchema[], account, provider)
+  try {
+    const LSP10Vaults = await controller.fetchData([
+      'LSP10Vaults[]'
+    ])
+    vaults.value = LSP10Vaults[0].value.length ? [account, ...LSP10Vaults[0].value] : [account]
+  } catch (e) {
+    console.log(e)
+    const LSP10Vaults = JSON.parse(localStorage.getItem('vaults') as string)
+    vaults.value = LSP10Vaults.value ? [account, ...LSP10Vaults.value] : [account]
+  }
   loading.value = false
 }
 
@@ -97,7 +105,7 @@ const close = async (step:number) => {
 
   <DialogComponent v-model:show="showDialog" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
     class="h-full max-w-screen-md !bg-light !rounded-none">
-    <CreateVault  @close="close" v-if="showDialog" ></CreateVault>
+    <CreateVault  @close="close" v-if="showDialog" :vaultLength="vaults.length -1"></CreateVault>
   </DialogComponent>
 </template>
 <style scoped>

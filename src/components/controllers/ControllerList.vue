@@ -26,7 +26,6 @@ const getAddressPermission = async () => {
   loading.value = true
   const { account, provider } = await getEthers()
   const result = await getPermissionList(account, provider)
-  console.log(result)
   permissionList.value = result as string[]
   loading.value = false
 }

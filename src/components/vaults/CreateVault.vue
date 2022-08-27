@@ -2,7 +2,10 @@
 import { onMounted, ref } from 'vue'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
 import { getEthers } from '@/composables/ethers'
-import { settingURDAddressInStorage } from '@/composables/createEOA'
+import { addVaultLength, settingURDAddressInStorage, setVaultList } from '@/composables/createEOA'
+const props = defineProps<{
+  vaultLength:number
+}>()
 
 const error = ref('')
 const step = ref(0)
@@ -22,6 +25,10 @@ const createVault = async () => {
       LSP9Vaults.value = [...LSP9Vaults.value, recipient.address]
       localStorage.setItem('vaults', JSON.stringify(LSP9Vaults))
     }
+    // TODO: register address manually for now , if LSP10Vaults is auto, need remove it
+    const btyesLength = await addVaultLength({ account, signer, privateKey: privateKey.value, length: props.vaultLength })
+    await setVaultList({ account, signer, thirdPartyAddress: recipient.address, privateKey: privateKey.value, btyesLength })
+
     step.value = 2
     txHash.value = recipient.hash
   } catch (err:Error) {

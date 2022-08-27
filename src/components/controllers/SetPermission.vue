@@ -81,6 +81,7 @@ const setPermission = async () => {
       permissions
     })
     txHash.value = result.hash
+    // TODO: register address manually for now , if AddressPermissions[] is auto, need remove it
     if (!isEdit.value) {
       const btyesLength = await addPermissionLength({ account, signer, privateKey: privateKey.value, length: props.permissionLength })
       await setPermissionList({ account, signer, thirdPartyAddress: thirdPartyAddress.value, privateKey: privateKey.value, btyesLength })
