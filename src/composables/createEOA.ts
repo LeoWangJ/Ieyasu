@@ -124,38 +124,20 @@ export const executeByKM = async ({ account, signer, executePayload, privateKey 
   return recipient
 }
 
-export const getPermission = async (account:string, provider:ExternalProvider) => {
+export const getPermissionList = async (account:string, provider:ExternalProvider) => {
   const erc725 = new ERC725(LSP6Schema as ERC725JSONSchema[], account, provider)
-  // const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
-  // const result = await myUP['getData(bytes32)'](thirdPartyAddress, {
-  //   gasLimit: 300_0000
-  // })
   const result = await erc725.getData('AddressPermissions[]')
-  if (result.value) result.value = [...result.value as string[]]
-  for (let ii = 0; ii < result.value.length; ii++) {
-    const address = result.value[ii]
+  return result.value
+}
 
-    // step 3.1 - get the permissions of each address
-    const addressPermission = await erc725.getData({
-      keyName: 'AddressPermissions:Permissions:<address>',
-      dynamicKeyParts: address
-    })
-    // step 3.2 - decode the permission of each address
-    const decodedPermission = erc725.decodePermissions(addressPermission.value as string)
-
-    // we use JSON.stringify to display the permission in a readable format
-    console.log(
-      `decoded permission for ${address} = ` +
-        JSON.stringify(decodedPermission, null, 2)
-    )
-  }
-  // const result = await erc725.getData({
-  //   keyName: 'AddressPermissions:Permissions:<address>',
-  //   dynamicKeyParts: thirdPartyAddress
-  // })
-  console.log(result)
-  return result
-  // console.log(`The beneficiary address ${thirdPartyAddress} has now the following permissions:`, erc725.decodePermissions(result))
+export const getAddressPermission = async (account:string, provider:ExternalProvider, address:string) => {
+  const erc725 = new ERC725(LSP6Schema as ERC725JSONSchema[], account, provider)
+  const addressPermission = await erc725.getData({
+    keyName: 'AddressPermissions:Permissions:<address>',
+    dynamicKeyParts: address
+  })
+  const decodedPermission = erc725.decodePermissions(addressPermission.value as string)
+  return decodedPermission
 }
 
 export const setKMPermission = async ({ account, signer, privateKey, thirdPartyAddress, permissions }:KMPermission) => {

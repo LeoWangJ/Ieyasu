@@ -1,19 +1,28 @@
 <script setup lang="ts">
-import { getPermission, setKMPermission, setVaultPermission } from '@/composables/createEOA'
+import { getAddressPermission, setKMPermission } from '@/composables/createEOA'
 import { getEthers } from '@/composables/ethers'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
-import { onMounted, reactive, ref, useAttrs } from 'vue'
-import { useStore } from 'vuex'
+import { onMounted, reactive, ref } from 'vue'
 import { NoticeBar } from 'vant'
-const store = useStore()
+import { computed } from '@vue/reactivity'
+import LoadingAnimate from '@/components/LoadingAnimate.vue'
+const props = defineProps<{
+  address: string
+}>()
 
-const attr = useAttrs()
+const isEdit = computed(() => {
+  return props.address !== ''
+})
+const dialogName = computed(() => {
+  return props.address === '' ? 'Grant' : 'Edit'
+})
 
 const emit = defineEmits(['close'])
 const error = ref('')
 const step = ref(0)
 const txHash = ref('')
 const disabled = ref(false)
+const loading = ref(false)
 const privateKey = ref('')
 const thirdPartyAddress = ref('')
 const initPermissions = {
@@ -26,9 +35,14 @@ const initPermissions = {
   DELEGATECALL: false,
   DEPLOY: false,
   TRANSFERVALUE: false,
-  SIGN: false
+  SIGN: false,
+  SUPER_CALL: false,
+  SUPER_DELEGATECALL: false,
+  SUPER_SETDATA: false,
+  SUPER_STATICCALL: false,
+  SUPER_TRANSFERVALUE: false
 }
-let permissions = reactive({ ...initPermissions })
+
 type PermissionsLis = 'CHANGEOWNER'|'CHANGEPERMISSIONS' | 'ADDPERMISSIONS'|'SETDATA'|'CALL'|'STATICCALL' | 'DELEGATECALL'|'DEPLOY'|'TRANSFERVALUE'|'SIGN'
 const permissionsLis:PermissionsLis[] = [
   'CHANGEOWNER',
@@ -42,8 +56,19 @@ const permissionsLis:PermissionsLis[] = [
   'TRANSFERVALUE',
   'SIGN'
 ]
+let permissions = reactive({ ...initPermissions })
 
-const grantPermission = async () => {
+onMounted(async () => {
+  if (isEdit.value) {
+    loading.value = true
+    const { account, provider } = await getEthers()
+    const result = await getAddressPermission(account, provider, props.address)
+    permissions = Object.assign(permissions, result)
+    loading.value = false
+  }
+})
+
+const setPermission = async () => {
   step.value = 1
   const { account, signer } = await getEthers()
   try {
@@ -51,7 +76,7 @@ const grantPermission = async () => {
       account,
       signer,
       privateKey: privateKey.value,
-      thirdPartyAddress: thirdPartyAddress.value,
+      thirdPartyAddress: props.address !== '' ? props.address : thirdPartyAddress.value,
       permissions
     })
     txHash.value = result.hash
@@ -60,13 +85,6 @@ const grantPermission = async () => {
     step.value = 0
     error.value = err
   }
-}
-const settingVaultPermission = async () => {
-  const { account, signer } = await getEthers()
-  const privateKey = process.env.VUE_APP_PRIVATE_KEY as string
-  const thirdPartyAddress = '0x5481a9AAC94975B22A269229Fd717651647E303f'
-  const result = await setVaultPermission(account, attr.address as string, signer, privateKey, thirdPartyAddress)
-  txHash.value = result.hash
 }
 
 const clickNavBar = () => {
@@ -79,10 +97,10 @@ const clickNavBar = () => {
 
 <template>
   <div class="text-primary">
-    <van-nav-bar title="Grant Permission" left-arrow @click-left="clickNavBar" />
+    <van-nav-bar :title="`${dialogName} Permission`" left-arrow @click-left="clickNavBar" />
       <van-steps :active="step" active-icon="success" class="my-2">
       <van-step>Input Infomation</van-step>
-      <van-step>Granting</van-step>
+      <van-step>{{`${dialogName}ing`}}</van-step>
       <van-step>🎉 Success</van-step>
     </van-steps>
 
@@ -90,18 +108,19 @@ const clickNavBar = () => {
       <NoticeBar color="#fff" background="#363636" wrapable  left-icon="info-o">
         <p> You can check the intention of all  <a class="text-theme" href="https://docs.lukso.tech/standards/universal-profile/lsp6-key-manager" target="_blaank">Permissions</a> </p>
       </NoticeBar>
-      <div class="text-primary m-2">Set Permissions</div>
-      <div class="grid gap-x-1.5 gap-y-2  m-3 grid-cols-1 sm:(grid-cols-2) md:(grid-cols-3)">
+      <div class="text-primary m-2">Permissions</div>
+      <LoadingAnimate v-if="loading"></LoadingAnimate>
+      <div v-else class="grid gap-x-1.5 gap-y-2  m-3 grid-cols-1 sm:(grid-cols-2) md:(grid-cols-3)">
         <div v-for="permission in permissionsLis" :key="permission" class="flex items-center">
           <van-switch v-model="permissions[permission]" active-color="#FB9904" inactive-color="#dcdee0" />
           <span class="ml-2">{{permission}}</span>
         </div>
       </div>
-      <van-field v-model="thirdPartyAddress" placeholder="0x..." label="Grant Address" />
+      <van-field v-if="!isEdit" v-model="thirdPartyAddress" placeholder="0x..." label="Grant Address" />
       <van-field v-model="privateKey" placeholder="Only used to execute the contract" label="Private Key" />
 
       <div class="flex m-3 justify-center">
-        <van-button  @click="grantPermission" :disabled="disabled">Grant Permission</van-button>
+        <van-button  @click="setPermission" :disabled="disabled">{{`${dialogName} Permission`}}</van-button>
       </div>
     </div>
     <div v-if="step == 1">

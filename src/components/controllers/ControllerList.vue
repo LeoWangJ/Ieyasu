@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { getPermission } from '@/composables/createEOA'
+import { getPermissionList } from '@/composables/createEOA'
 import { getEthers } from '@/composables/ethers'
 import { onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { Button, Toast, Dialog } from 'vant'
 import { useClipboard } from '@vueuse/core'
-import GrantPermission from './GrantPermission.vue'
+import SetPermission from './SetPermission.vue'
+import RestrictAddressesToVault from './RestrictAddressesToVault.vue'
 import LoadingAnimate from '../LoadingAnimate.vue'
 const DialogComponent = Dialog.Component
 
@@ -14,6 +15,8 @@ const showDialog = ref(false)
 const loading = ref(true)
 const permissionList = ref<string[]>([])
 const address = ref('')
+const thirdPartyAddress = ref('')
+const showComponent = ref('')
 const { copy, copied } = useClipboard({ source: address })
 
 onMounted(async () => {
@@ -22,20 +25,22 @@ onMounted(async () => {
 const getAddressPermission = async () => {
   loading.value = true
   const { account, provider } = await getEthers()
-  const result = await getPermission(account, provider)
-  permissionList.value = result.value as string[]
+  const result = await getPermissionList(account, provider)
+  permissionList.value = result as string[]
   loading.value = false
-}
-
-const grantPermission = () => {
-  showDialog.value = true
 }
 
 const close = async (step:number) => {
   showDialog.value = false
-  if (step === 2) {
+  if (step === 2 && showComponent.value === 'SET') {
     await getAddressPermission()
   }
+}
+
+const open = (type?:string, address?:string) => {
+  thirdPartyAddress.value = address ?? ''
+  showDialog.value = true
+  showComponent.value = type === 'RESTRICT' ? 'RESTRICT' : 'SET'
 }
 
 const copyHandler = (permissionAddress:string) => {
@@ -47,23 +52,30 @@ const copyHandler = (permissionAddress:string) => {
 
 <template>
   <div class="flex m-3">
-    <Button class="!mr-3" @click="grantPermission" :disabled="store.state.isVault">Grant Permission</Button>
+    <Button class="!mr-3" @click="open('SET')" :disabled="store.state.isVault">Grant Permission</Button>
   </div>
   <LoadingAnimate v-if="loading"></LoadingAnimate>
   <div v-if="permissionList.length && !loading">
     <p class="m-2 text-primary">Controllers</p>
-    <van-cell v-for="(address) in permissionList" is-link :key="address" size="large" center class="cell truncate" >
+    <van-cell  v-for="(address) in permissionList" is-link :key="address" size="large" center class="cell truncate" >
       <template #title>
         <div class="text-shadow-lg">
         {{ `${address.slice(0,8)}...${address.slice(-6)}` }}
-        <van-icon name="link-o" @click="copyHandler(address)" class="cursor-pointer"/>
+        <van-icon clsss="z-1" name="link-o" @click.prevent="copyHandler(address)" class="cursor-pointer"/>
         </div>
+      </template>
+      <template #right-icon>
+        <van-icon @click="open('SET',address)" name="edit" size="20px" class="mr-2" />
+        <van-icon @click="open('RESTRICT',address)" name="setting-o" size="20px"/>
       </template>
     </van-cell>
   </div>
   <DialogComponent v-model:show="showDialog" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
     class="h-full max-w-screen-md !bg-light !rounded-none">
-    <GrantPermission @close="close"></GrantPermission>
+    <div v-if="showDialog">
+      <SetPermission v-if="showComponent === 'SET'" :address="thirdPartyAddress" @close="close"></SetPermission>
+      <RestrictAddressesToVault v-else :address="thirdPartyAddress"  @close="close"></RestrictAddressesToVault>
+    </div>
   </DialogComponent>
 </template>
 <style scoped>
