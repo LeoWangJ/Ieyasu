@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getAddressPermission, setKMPermission } from '@/composables/createEOA'
+import { getAddressPermission, setKMPermission, setPermissionList, addPermissionLength } from '@/composables/createEOA'
 import { getEthers } from '@/composables/ethers'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
 import { onMounted, reactive, ref } from 'vue'
@@ -7,7 +7,8 @@ import { NoticeBar } from 'vant'
 import { computed } from '@vue/reactivity'
 import LoadingAnimate from '@/components/LoadingAnimate.vue'
 const props = defineProps<{
-  address: string
+  address: string,
+  permissionLength:number
 }>()
 
 const isEdit = computed(() => {
@@ -76,10 +77,14 @@ const setPermission = async () => {
       account,
       signer,
       privateKey: privateKey.value,
-      thirdPartyAddress: props.address !== '' ? props.address : thirdPartyAddress.value,
+      thirdPartyAddress: isEdit.value ? props.address : thirdPartyAddress.value,
       permissions
     })
     txHash.value = result.hash
+    if (!isEdit.value) {
+      const btyesLength = await addPermissionLength({ account, signer, privateKey: privateKey.value, length: props.permissionLength })
+      await setPermissionList({ account, signer, thirdPartyAddress: thirdPartyAddress.value, privateKey: privateKey.value, btyesLength })
+    }
     step.value = 2
   } catch (err:Error) {
     step.value = 0

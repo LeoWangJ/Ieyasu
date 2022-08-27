@@ -43,6 +43,20 @@ interface KMPermission{
   permissions:Permissions
 }
 
+interface AddPermissionLength{
+  account:string
+  signer:Signer
+  privateKey:string
+  length:number
+}
+interface SetPermissionList{
+  account:string
+  signer:Signer
+  privateKey:string
+  thirdPartyAddress:string
+  btyesLength:string
+}
+
 export const createEOA = () => {
   const myEOA = ethers.Wallet.createRandom()
   return myEOA
@@ -130,6 +144,37 @@ export const getPermissionList = async (account:string, provider:ExternalProvide
   return result.value
 }
 
+export const addPermissionLength = async ({ account, signer, privateKey, length }:AddPermissionLength) => {
+  const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
+  const indexLength = `${length + 1}`.length
+  const btyesLength = ethers.constants.HashZero.slice(0, ethers.constants.HashZero.length - indexLength) + `${length + 1}`
+  const allowedAddressesDataKey = ERC725YKeys.LSP6['AddressPermissions[]'].length
+  const setDataPayload = await myUP.interface.encodeFunctionData('setData(bytes32,bytes)', [allowedAddressesDataKey, btyesLength])
+
+  await executeByKM({
+    account,
+    signer,
+    executePayload: setDataPayload,
+    privateKey
+  })
+  return btyesLength
+}
+
+export const setPermissionList = async ({ account, signer, privateKey, thirdPartyAddress, btyesLength }:SetPermissionList) => {
+  const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
+  const allowedAddressesIndex = ERC725YKeys.LSP6['AddressPermissions[]'].index
+  const allowedAddressesDataKey = allowedAddressesIndex + btyesLength.slice(allowedAddressesIndex.length)
+  const setDataPayload = await myUP.interface.encodeFunctionData('setData(bytes32,bytes)', [allowedAddressesDataKey, thirdPartyAddress])
+
+  const recipient = await executeByKM({
+    account,
+    signer,
+    executePayload: setDataPayload,
+    privateKey
+  })
+  return recipient
+}
+
 export const getAddressPermission = async (account:string, provider:ExternalProvider, address:string) => {
   const erc725 = new ERC725(LSP6Schema as ERC725JSONSchema[], account, provider)
   const addressPermission = await erc725.getData({
@@ -149,6 +194,7 @@ export const setKMPermission = async ({ account, signer, privateKey, thirdPartyA
     dynamicKeyParts: thirdPartyAddress,
     value: beneficiaryPermissions as string
   }])
+  console.log('data:', data)
   const executePayload = await myUP.interface.encodeFunctionData('setData(bytes32,bytes)', [data.keys[0], data.values[0]])
   const recipient = await executeByKM({
     account,
@@ -156,6 +202,7 @@ export const setKMPermission = async ({ account, signer, privateKey, thirdPartyA
     executePayload,
     privateKey
   })
+  console.log('recipient:', recipient)
   return recipient
 }
 

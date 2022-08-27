@@ -26,6 +26,7 @@ const getAddressPermission = async () => {
   loading.value = true
   const { account, provider } = await getEthers()
   const result = await getPermissionList(account, provider)
+  console.log(result)
   permissionList.value = result as string[]
   loading.value = false
 }
@@ -73,7 +74,7 @@ const copyHandler = (permissionAddress:string) => {
   <DialogComponent v-model:show="showDialog" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
     class="h-full max-w-screen-md !bg-light !rounded-none">
     <div v-if="showDialog">
-      <SetPermission v-if="showComponent === 'SET'" :address="thirdPartyAddress" @close="close"></SetPermission>
+      <SetPermission v-if="showComponent === 'SET'" :address="thirdPartyAddress" :permissionLength="permissionList.length" @close="close"></SetPermission>
       <RestrictAddressesToVault v-else :address="thirdPartyAddress"  @close="close"></RestrictAddressesToVault>
     </div>
   </DialogComponent>
