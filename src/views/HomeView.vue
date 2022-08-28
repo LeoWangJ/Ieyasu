@@ -4,7 +4,7 @@ import LSP5ReceivedAssets from '@/components/received/LSP5ReceivedAssets.vue'
 import LSP12CreatedAssets from '@/components/created/LSP12CreatedAssets.vue'
 import LSP10Vault from '@/components/vaults/LSP10Vault.vue'
 import ControllerList from '@/components/controllers/ControllerList.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, shallowRef, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Toast, Tab, Tabs } from 'vant'
 import { getEthers } from '@/composables/ethers'
@@ -14,12 +14,10 @@ onMounted(async () => {
   await login()
 })
 const active = ref(0)
-const tabs = [
+const tabs = shallowRef([
   { id: 0, name: 'Received', component: LSP5ReceivedAssets },
-  { id: 1, name: 'Created', component: LSP12CreatedAssets },
-  { id: 2, name: 'Vaults', component: LSP10Vault },
-  { id: 3, name: 'Controllers', component: ControllerList }
-]
+  { id: 1, name: 'Created', component: LSP12CreatedAssets }
+])
 const login = async () => {
   const router = useRouter()
   try {
@@ -29,11 +27,13 @@ const login = async () => {
     }
     await store.dispatch('initAddress', account)
     setupLocalStorage('legacyAssets', account)
-    setupLocalStorage('vaults', account)
     if (isEOAccount) {
+      setupLocalStorage('vaults', account)
       setupLocalStorage('receivedAssets', account)
       setupLocalStorage('issuedAssets', account)
     } else {
+      tabs.value = [...tabs.value, { id: 2, name: 'Vaults', component: LSP10Vault }, { id: 3, name: 'Controllers', component: ControllerList }]
+
       // clearLocalStorage('receivedAssets')
       // clearLocalStorage('issuedAssets')
       // clearLocalStorage('vaults')

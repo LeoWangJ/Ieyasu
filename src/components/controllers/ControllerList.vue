@@ -25,8 +25,12 @@ onMounted(async () => {
 const getAddressPermission = async () => {
   loading.value = true
   const { account, provider } = await getEthers()
-  const result = await getPermissionList(account, provider)
-  permissionList.value = result as string[]
+  try {
+    const result = await getPermissionList(account, provider)
+    permissionList.value = result as string[]
+  } catch (e) {
+    console.log(e)
+  }
   loading.value = false
 }
 
