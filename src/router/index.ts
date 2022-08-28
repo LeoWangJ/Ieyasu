@@ -10,16 +10,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue')
-  },
-  {
-    path: '/create-token',
-    name: 'createToken',
-    component: () => import('../views/CreateToken.vue')
-  },
-  {
-    path: '/create-nft-token',
-    name: 'createNFTToken',
-    component: () => import('../views/CreateNFTToken.vue')
   }
 ]
 

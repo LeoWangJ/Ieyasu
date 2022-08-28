@@ -9,6 +9,8 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     BalanceOf: typeof import('./src/components/BalanceOf.vue')['default']
     ControllerList: typeof import('./src/components/controllers/ControllerList.vue')['default']
+    CreateNFTToken: typeof import('./src/components/created/CreateNFTToken.vue')['default']
+    CreateToken: typeof import('./src/components/created/CreateToken.vue')['default']
     CreateVault: typeof import('./src/components/vaults/CreateVault.vue')['default']
     LegacyLSPAssets: typeof import('./src/components/received/LegacyLSPAssets.vue')['default']
     LoadingAnimate: typeof import('./src/components/LoadingAnimate.vue')['default']

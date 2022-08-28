@@ -11,7 +11,7 @@ import { getEthers } from '@/composables/ethers'
 import { ethers } from 'ethers'
 import { Toast, UploaderFileListItem } from 'vant'
 const router = useRouter()
-
+const emit = defineEmits(['close'])
 const isEOA = ref(false)
 const isL16Network = ref(true)
 const isSuccess = ref(false)
@@ -46,11 +46,12 @@ const deploy = async () => {
   const { account, chainId, ethereumProvider } = await getEthers()
   const factory = new LSPFactory(ethereumProvider, { chainId })
   try {
-    await factory.LSP8IdentifiableDigitalAsset.deploy({
+    await factory.LSP7DigitalAsset.deploy({
       name: tokenInfo.name,
       symbol: tokenInfo.symbol,
       controllerAddress: account,
       creators: [account],
+      isNFT: false,
       digitalAssetMetadata: {
         description: tokenInfo.description,
         icon: tokenInfo.icon[0]?.file,
@@ -59,7 +60,7 @@ const deploy = async () => {
         assets: []
       }
     }, {
-      LSP8IdentifiableDigitalAsset: {
+      LSP7DigitalAsset: {
         version: undefined
       },
       ipfsGateway: IPFS_GATEWAY_API_BASE_URL,
@@ -70,15 +71,15 @@ const deploy = async () => {
           step.value = 1
           deployEvent.value.push(deploymentEvent)
         },
-        error: (err) => {
+        error: (err:Error) => {
           console.log('error', err)
           isDeploying.value = false
           error.value = err.message
         },
         complete: async (contracts) => {
           console.log('Deployment Complete')
-          console.log(contracts.LSP8IdentifiableDigitalAsset)
-          await transaction(contracts.LSP8IdentifiableDigitalAsset.address)
+          console.log(contracts.LSP7DigitalAsset)
+          await transaction(contracts.LSP7DigitalAsset.address)
         }
       }
     })
@@ -88,7 +89,7 @@ const deploy = async () => {
   }
 }
 const transaction = async (deployedAssetAddress: string) => {
-  const { account, provider, isEOAccount, signer } = await getEthers()
+  const { account, provider, signer, isEOAccount } = await getEthers()
 
   const LSP12controller = new ERC725js(LSP12IssuedAssetsSchema as ERC725JSONSchema[], account, provider, {
     ipfsGateway: IPFS_GATEWAY_BASE_URL
@@ -118,7 +119,7 @@ const transaction = async (deployedAssetAddress: string) => {
     {
       keyName: 'LSP12IssuedAssetsMap:<address>',
       dynamicKeyParts: deployedAssetAddress,
-      value: [INTERFACEID.LSP8IdentifiableDigitalAsset, (LSP12IssuedAssets.length - 1) as unknown as string]
+      value: [INTERFACEID.LSP7DigitalAsset, (LSP12IssuedAssets.length - 1) as unknown as string]
     }
   ])
   console.log('encodedErc725Data:', encodedErc725Data)
@@ -147,24 +148,28 @@ const transaction = async (deployedAssetAddress: string) => {
   isSuccess.value = true
   Toast.success('success!')
 }
+const clickNavBar = () => {
+  emit('close', step.value)
+}
 </script>
 
 <template>
   <div class="text-primary">
-    <van-nav-bar title="Create NFT Collection" left-arrow @click-left="router.push({name:'home'})"/>
-    <div v-if="isEOA" >The NFT Collection has been deployed and configured correctly, but because of MetaMask, the asset can only be stored in the browser's local storage.</div>
+    <van-nav-bar title="Create Token" left-arrow @click-left="clickNavBar"/>
+    <div v-if="isEOA" >The Token has been deployed and configured correctly, but because of MetaMask, the asset can only be stored in the browser's local storage.</div>
+
     <div v-if="!isDeploying && !deployEvent.length">
       <div v-if="isL16Network" >
-        <h2 class="m-2">Create your own ERC721-like Collection based on <a class="text-theme" href="https://docs.lukso.tech/standards/nft-2.0/LSP8-Identifiable-Digital-Asset" target="_blank">LSP8</a></h2>
-        <van-field v-model="tokenInfo.name" placeholder="Name" />
-        <van-field v-model="tokenInfo.symbol" placeholder="Token Symbol" />
-        <van-field v-model="tokenInfo.description" placeholder="Description" />
+          <h2 class="m-2">Create your own ERC20-like Token based on <a class="text-theme" href="https://docs.lukso.tech/standards/nft-2.0/LSP7-Digital-Asset" target="_blank">LSP7</a></h2>
+          <van-field v-model="tokenInfo.name" placeholder="Name" />
+          <van-field v-model="tokenInfo.symbol" placeholder="Token Symbol" />
+          <van-field v-model="tokenInfo.description" placeholder="Description" />
         <div class="mx-2 flex flex-col items-center">
-          <div class="m-2">Choose NFT Collection Icon</div>
+          <div class="m-2">Choose Token Icon</div>
           <van-uploader v-model="tokenInfo.icon" :max-count="1" />
         </div>
         <div class="flex m-3 justify-center">
-          <van-button  @click="deploy" :disabled="disabled">DEPLOY NFT COLLECTION</van-button>
+          <van-button  @click="deploy" :disabled="disabled">DEPLOY TOKEN</van-button>
         </div>
       </div>
       <p v-else>
