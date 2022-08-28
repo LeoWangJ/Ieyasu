@@ -18,9 +18,16 @@ const privateKey = ref('')
 const vaultAddress = ref('')
 
 const settingVaultPermission = async () => {
+  step.value = 1
   const { account, signer } = await getEthers()
-  const result = await setVaultPermission(account, vaultAddress.value, signer, privateKey.value, props.address)
-  txHash.value = result.hash
+  try {
+    const result = await setVaultPermission(account, vaultAddress.value, signer, privateKey.value, props.address)
+    txHash.value = result.hash
+    step.value = 2
+  } catch (err:Error) {
+    step.value = 0
+    error.value = err
+  }
 }
 
 const clickNavBar = () => {
