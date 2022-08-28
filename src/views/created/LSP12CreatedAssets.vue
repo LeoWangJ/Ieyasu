@@ -10,7 +10,7 @@ import NFTAssets from '@/components/NFTAssets.vue'
 import { Button, NoticeBar, Dialog } from 'vant'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import LoadingAnimate from '../LoadingAnimate.vue'
+import LoadingAnimate from '@/components/LoadingAnimate.vue'
 import CreateToken from './CreateToken.vue'
 import CreateNFTToken from './CreateNFTToken.vue'
 const store = useStore()

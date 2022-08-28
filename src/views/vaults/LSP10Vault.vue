@@ -8,7 +8,7 @@ import { useClipboard } from '@vueuse/core'
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { useStore } from 'vuex'
 import CreateVault from './CreateVault.vue'
-import LoadingAnimate from '../LoadingAnimate.vue'
+import LoadingAnimate from '@/components/LoadingAnimate.vue'
 const store = useStore()
 
 const disabled = ref(false)

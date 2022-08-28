@@ -13,7 +13,7 @@ import type { ReceivedTokens } from '@/utils/types'
 import { Dialog } from 'vant'
 import LegacyLSPAssets from './LegacyLSPAssets.vue'
 import { useStore } from 'vuex'
-import LoadingAnimate from '../LoadingAnimate.vue'
+import LoadingAnimate from '@/components/LoadingAnimate.vue'
 const store = useStore()
 
 const receivedAssets = ref<string[]>([])

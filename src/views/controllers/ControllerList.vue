@@ -7,7 +7,7 @@ import { Button, Toast, Dialog } from 'vant'
 import { useClipboard } from '@vueuse/core'
 import SetPermission from './SetPermission.vue'
 import RestrictAddressesToVault from './RestrictAddressesToVault.vue'
-import LoadingAnimate from '../LoadingAnimate.vue'
+import LoadingAnimate from '@/components/LoadingAnimate.vue'
 const DialogComponent = Dialog.Component
 
 const store = useStore()

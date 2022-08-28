@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import ProfileInfo from '@/components/ProfileInfo.vue'
-import LSP5ReceivedAssets from '@/components/received/LSP5ReceivedAssets.vue'
-import LSP12CreatedAssets from '@/components/created/LSP12CreatedAssets.vue'
-import LSP10Vault from '@/components/vaults/LSP10Vault.vue'
-import ControllerList from '@/components/controllers/ControllerList.vue'
+import LSP5ReceivedAssets from './received/LSP5ReceivedAssets.vue'
+import LSP12CreatedAssets from './created/LSP12CreatedAssets.vue'
+import LSP10Vault from './vaults/LSP10Vault.vue'
+import ControllerList from './controllers/ControllerList.vue'
 import { onMounted, shallowRef, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Toast, Tab, Tabs } from 'vant'
