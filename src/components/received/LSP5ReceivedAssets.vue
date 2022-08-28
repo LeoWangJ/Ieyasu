@@ -84,7 +84,6 @@ const getReceivedAssets = async () => {
 
 const closeLegacy = async () => {
   showLegacy.value = false
-  await getReceivedAssets()
 }
 
 </script>
@@ -100,6 +99,7 @@ const closeLegacy = async () => {
       <TokenAssets
         :location="LOCATION.received"
         :address="item.address"
+         @update="getReceivedAssets"
         v-for="(item,index) in receivedTokens"
         :key="index">
       </TokenAssets>
@@ -110,6 +110,7 @@ const closeLegacy = async () => {
         :location="LOCATION.received"
         :address="item.address"
         :tokenId="item.tokenId"
+         @update="getReceivedAssets"
         v-for="(item,index) in receivedNFTTokens"
         :key="index">
       </NFTAssets>
@@ -117,7 +118,7 @@ const closeLegacy = async () => {
   </template>
   <DialogComponent v-model:show="showLegacy" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
     class="h-full max-w-screen-md !bg-light !rounded-none">
-    <LegacyLSPAssets @close="closeLegacy"></LegacyLSPAssets>
+    <LegacyLSPAssets @close="closeLegacy" @update="getReceivedAssets"></LegacyLSPAssets>
   </DialogComponent>
 </template>
 <style scoped>

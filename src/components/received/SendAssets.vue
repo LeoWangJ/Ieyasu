@@ -4,13 +4,12 @@ import LSP8IdentifiableDigitalAsset from '@lukso/lsp-smart-contracts/artifacts/L
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { NFT } from '@/utils/types'
 import { onMounted, ref } from 'vue'
-import { BLOCKCHAIN_EXPLORER_BASE_URL, RPC_URLS } from '@/utils/config'
+import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
 import { getEthers } from '@/composables/ethers'
 import { ethers, Signer } from 'ethers'
 import { Toast, NoticeBar } from 'vant'
 import { handlerIPFSImg } from '@/utils'
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json'
-import LSP6KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
 import LSP9Vault from '@lukso/lsp-smart-contracts/artifacts/LSP9Vault.json'
 
 import { useStore } from 'vuex'
@@ -22,7 +21,7 @@ const props = defineProps<{
   assets: NFT
 }>()
 
-const emit = defineEmits(['update:show'])
+const emit = defineEmits(['update:show', 'update'])
 const isL16Network = ref(true)
 const disabled = ref(false)
 const error = ref('')
@@ -138,9 +137,10 @@ const clickNavBar = () => {
   if (step.value === 1) {
     step.value = 0
     error.value = ''
-  } else if (step.value === 2) {
-    location.reload()
   } else {
+    if (step.value === 2) {
+      emit('update')
+    }
     disabled.value = false
     error.value = ''
     step.value = 0

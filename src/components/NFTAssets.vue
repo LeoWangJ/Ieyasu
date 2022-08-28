@@ -16,6 +16,7 @@ import type { Component } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore()
 
+const emit = defineEmits(['update'])
 const DialogComponent = Dialog.Component
 const props = defineProps<{
   address: string,
@@ -86,7 +87,7 @@ const openDialog = () => {
     </Cell>
     <DialogComponent v-model:show="showDialog" teleport="body" width="100%" :overlay="false"
       :show-confirm-button="false" class="h-full max-w-screen-md !bg-light !rounded-none">
-      <component :is="component" v-model:show="showDialog" :assets="nft"></component>
+      <component :is="component" v-model:show="showDialog" :assets="nft" @update="emit('update')"></component>
     </DialogComponent>
   </div>
 </template>

@@ -15,6 +15,7 @@ import SendAssets from '@/components/received/SendAssets.vue'
 import { NFT } from '@/utils/types'
 import { useStore } from 'vuex'
 const store = useStore()
+const emit = defineEmits(['update'])
 
 const props = defineProps<{
   address: string,
@@ -74,7 +75,7 @@ const openDialog = () => {
   </div>
   <DialogComponent v-model:show="showDialog" teleport="body" width="100%" :overlay="false" :show-confirm-button="false"
     class="h-full max-w-screen-md !bg-light !rounded-none">
-    <component :is="component" v-model:show="showDialog" :assets="token"></component>
+    <component :is="component" v-model:show="showDialog" :assets="token" @update="emit('update')"></component>
   </DialogComponent>
 </template>
 

@@ -2,7 +2,7 @@
 import { Toast } from 'vant'
 import { ref } from 'vue'
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'update'])
 const legacyAddress = ref('')
 const error = ref('')
 const disabled = ref(false)
@@ -16,7 +16,6 @@ const sendLegacyAddress = () => {
     return
   }
   const LSP5LegacyAssets = JSON.parse(localStorage.getItem('legacyAssets') as string)
-  console.log('LSP5LegacyAssets.value.indexOf(legacyAddress):', LSP5LegacyAssets.value.indexOf(legacyAddress))
   if (LSP5LegacyAssets.value.indexOf(legacyAddress) === -1) {
     LSP5LegacyAssets.value = [...LSP5LegacyAssets.value, legacyAddress.value]
     localStorage.setItem('legacyAssets', JSON.stringify(LSP5LegacyAssets))
@@ -28,6 +27,7 @@ const sendLegacyAddress = () => {
     message: 'success!',
     duration: 1000,
     onClose: () => {
+      emit('update')
       emit('close')
     }
   })
