@@ -22,13 +22,15 @@ const receivedNFTTokens = ref<ReceivedTokens[]>([])
 const showLegacy = ref(false)
 const loading = ref(true)
 const DialogComponent = Dialog.Component
+
 onMounted(async () => {
   if (store.state.currentAddress) {
     await getReceivedAssets()
   }
 })
+const updateReceivedList = computed(() => store.state.updateReceivedList)
 const address = computed(() => store.state.currentAddress)
-watch([address], async (now, prev) => {
+watch([address, updateReceivedList], async (now, prev) => {
   if (now !== prev) {
     await getReceivedAssets()
   }
@@ -99,7 +101,6 @@ const closeLegacy = async () => {
       <TokenAssets
         :location="LOCATION.received"
         :address="item.address"
-         @update="getReceivedAssets"
         v-for="(item,index) in receivedTokens"
         :key="index">
       </TokenAssets>
@@ -110,7 +111,6 @@ const closeLegacy = async () => {
         :location="LOCATION.received"
         :address="item.address"
         :tokenId="item.tokenId"
-         @update="getReceivedAssets"
         v-for="(item,index) in receivedNFTTokens"
         :key="index">
       </NFTAssets>

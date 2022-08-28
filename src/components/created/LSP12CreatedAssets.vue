@@ -89,6 +89,7 @@ const getCreateAssets = async () => {
       <p class="m-2 text-primary">TOKENs</p>
       <TokenAssets
         :location="LOCATION.created"
+        @update="getCreateAssets"
         v-for="(address,index) in receivedTokens"
         :address="address"
         :key="index">
@@ -98,6 +99,7 @@ const getCreateAssets = async () => {
       <p class="m-2 text-primary">NFTs</p>
       <NFTAssets
         :location="LOCATION.created"
+        @update="getCreateAssets"
         v-for="(address,index) in receivedNFTTokens"
         :address="address"
         :key="index">

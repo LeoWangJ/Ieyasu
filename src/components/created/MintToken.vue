@@ -23,7 +23,7 @@ const isMinterEOA = ref(false)
 const mintAmount = ref(0)
 const mintAddress = ref(store.state.account)
 const txHash = ref('')
-const emit = defineEmits(['update:show'])
+const emit = defineEmits(['update:show', 'update'])
 
 onMounted(async () => {
   await checkNetwork()
@@ -75,11 +75,13 @@ const clickNavBar = () => {
   if (step.value === 1) {
     step.value = 0
     error.value = ''
-  } else if (step.value === 2) {
-    location.reload()
   } else {
     disabled.value = false
     error.value = ''
+    if (step.value === 2) {
+      store.commit('triggerUpdateReceivedList')
+      emit('update')
+    }
     step.value = 0
     isMinterEOA.value = false
     mintAmount.value = 0

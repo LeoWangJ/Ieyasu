@@ -5,7 +5,8 @@ export default createStore({
     account: '',
     currentAddress: '',
     LSP10Vaults: { account: '', value: [] },
-    isVault: false
+    isVault: false,
+    updateReceivedList: 0
   },
   getters: {
   },
@@ -22,6 +23,9 @@ export default createStore({
       } else {
         console.log(`not found ${address} vault`)
       }
+    },
+    triggerUpdateReceivedList (state) {
+      state.updateReceivedList = state.updateReceivedList + 1
     }
   },
   actions: {

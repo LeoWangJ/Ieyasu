@@ -7,7 +7,9 @@ import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { ethers } from 'ethers'
 import { Toast, NoticeBar } from 'vant'
+import { useStore } from 'vuex'
 import { handlerIPFSImg } from '@/utils'
+const store = useStore()
 
 const props = defineProps<{
   show: boolean,
@@ -19,13 +21,14 @@ const disabled = ref(false)
 const error = ref('')
 const step = ref(0)
 const isMinterEOA = ref(false)
+const mintAddress = ref(store.state.account)
 const mintInfo = reactive({
   tokenId: '',
   icon: null,
   description: ''
 })
 const txHash = ref('')
-const emit = defineEmits(['update:show'])
+const emit = defineEmits(['update:show', 'update'])
 
 onMounted(async () => {
   await checkNetwork()
@@ -53,7 +56,7 @@ const mint = async () => {
   const paddedTokenId = ethers.utils.formatBytes32String(`${mintInfo.tokenId}`)
   try {
     const lsp8IdentifiableDigitalAssetContract = new ethers.Contract(props.assets.address, LSP8Mintable.abi, signer)
-    const receipt = await lsp8IdentifiableDigitalAssetContract.mint(account, paddedTokenId, isMinterEOA.value, '0x')
+    const receipt = await lsp8IdentifiableDigitalAssetContract.mint(mintAddress.value, paddedTokenId, isMinterEOA.value, '0x')
     txHash.value = receipt.hash
     if (isEOAccount) {
       const LSP5ReceivedAssets = JSON.parse(localStorage.getItem('receivedAssets') as string)
@@ -77,11 +80,13 @@ const clickNavBar = () => {
   if (step.value === 1) {
     step.value = 0
     error.value = ''
-  } else if (step.value === 2) {
-    location.reload()
   } else {
     disabled.value = false
     error.value = ''
+    if (step.value === 2) {
+      emit('update')
+      store.commit('triggerUpdateReceivedList')
+    }
     step.value = 0
     isMinterEOA.value = false
     mintInfo.tokenId = ''
@@ -115,6 +120,7 @@ const clickNavBar = () => {
         ></van-image>
       </div>
       <van-field v-model.number="mintInfo.tokenId" placeholder="tokenId" number label="Mint tokenID" />
+       <van-field v-model="mintAddress" placeholder="mint address" number label="Mint Address" />
       <div class="flex m-3 justify-center">
         <van-button  @click="mint" :disabled="disabled">MINT NFT Collection</van-button>
       </div>

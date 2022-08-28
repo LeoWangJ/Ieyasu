@@ -139,7 +139,7 @@ const clickNavBar = () => {
     error.value = ''
   } else {
     if (step.value === 2) {
-      emit('update')
+      store.commit('triggerUpdateReceivedList')
     }
     disabled.value = false
     error.value = ''
