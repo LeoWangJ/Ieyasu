@@ -34,36 +34,58 @@ Youtube - [Universal Profile Tools - Token & NFT Wallet With Vault Manager](http
 
 
 # Demo by Picture 
-- Show received assets
+- Show received assets  
+
 ![](./public/received.png)
-- Find legacy assets
+
+- Find legacy assets  
+
 ![](./public/find_legacy_assets.png)
-- Transfer LSP7/LSP8 assets
+
+- Transfer LSP7/LSP8 assets  
+
 ![](./public/transfer.png)
-- Ttransfer lyx
+
+- Ttransfer lyx  
+
 ![](./public/transfer_lyx.png)
-- Show created assets
+
+- Show created assets  
+
 ![](./public/vaults.png)
 
-- Create LSP7/LSP8 token 
+- Create LSP7/LSP8 token   
+
 ![](./public/create_token.png)
-- Mint LSP7/LSP8 token 
+
+- Mint LSP7/LSP8 token   
+
 ![](./public/mint_nft.png)
-- Show created vaults 
+
+- Show created vaults   
+
 ![](./public/controllers.png)
+
  You can switch checked to change owner or vaults to see received / transfer assets 
-- Create vault
+
+- Create vault  
+
 ![](./public/create_vault.png)
-- Show created controllers 
+
+- Show created controllers   
+
 ![](./public/created.png)
 
-- Grant permission
+- Grant permission  
+
 ![](./public/grant_permission.png)
 
-- Edit permission
+- Edit permission  
+
 ![](./public/edit_permission.png)
 
-- Restrict addresses to vaults
+- Restrict addresses to vaults  
+
 ![](./public/restrict_address_to_vaults.png)
 
 # Team
