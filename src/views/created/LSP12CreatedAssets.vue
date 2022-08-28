@@ -8,7 +8,6 @@ import { computed, onMounted, ref, watch } from 'vue'
 import TokenAssets from '@/components/TokenAssets.vue'
 import NFTAssets from '@/components/NFTAssets.vue'
 import { Button, NoticeBar, Dialog } from 'vant'
-import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import LoadingAnimate from '@/components/LoadingAnimate.vue'
 import CreateToken from './CreateToken.vue'
@@ -16,7 +15,6 @@ import CreateNFTToken from './CreateNFTToken.vue'
 const store = useStore()
 const DialogComponent = Dialog.Component
 
-const router = useRouter()
 const receivedAssets = ref<string[]>([])
 const receivedTokens = ref<string[]>([])
 const receivedNFTTokens = ref<string[]>([])

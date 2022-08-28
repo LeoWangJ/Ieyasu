@@ -36,7 +36,7 @@ const login = async () => {
 
       // clearLocalStorage('receivedAssets')
       // clearLocalStorage('issuedAssets')
-      // clearLocalStorage('vaults')
+      clearLocalStorage('vaults')
     }
   } catch (e) {
     Toast.fail('Not Login')

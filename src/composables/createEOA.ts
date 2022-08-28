@@ -8,7 +8,7 @@ import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProf
 import LSP6KeyManager from '@lukso/lsp-smart-contracts/artifacts/LSP6KeyManager.json'
 import LSP6Schema from '@erc725/erc725.js/schemas/LSP6KeyManager.json'
 import { ERC725, ERC725JSONSchema } from '@erc725/erc725.js'
-import { ExternalProvider, Provider } from '@ethersproject/providers'
+import { ExternalProvider } from '@ethersproject/providers'
 
 interface ExecuteByKMParameter{
   account:string
@@ -92,8 +92,8 @@ export const createURD = async (address:string, signer:Signer) => {
   try {
     const transaction = await contract.deployTransaction.wait()
     return { ...contract, contractAddress: transaction.contractAddress }
-  } catch (error:any) {
-    console.log('Failed to deploy in TX:', error.transactionHash)
+  } catch (error) {
+    console.log('Failed to deploy')
     throw error
   }
 }
@@ -137,8 +137,8 @@ export const createMyVault = async (address:string, signer:Signer) => {
     const contract = await myVault.deploy(address, { gasLimit: 1000000 })
     const transaction = await contract.deployTransaction.wait()
     return { ...contract, contractAddress: transaction.contractAddress }
-  } catch (error:any) {
-    console.log('Failed to deploy in TX:', error.transactionHash)
+  } catch (error) {
+    console.log('Failed to deploy Vault')
     throw error
   }
 }
@@ -146,7 +146,7 @@ export const createMyVault = async (address:string, signer:Signer) => {
 export const settingURDAddressInStorage = async (account:string, signer:Signer, privateKey:string) => {
   const URD_DATA_KEY = ERC725YKeys.LSP0.LSP1UniversalReceiverDelegate
   const myUP = new ethers.Contract(account, UniversalProfile.abi, signer)
-  const deployVault:any = await createMyVault(account, signer)
+  const deployVault = await createMyVault(account, signer)
   const deployURD = await createURD(account, signer)
   const setDataPayload = await deployVault.interface.encodeFunctionData('setData(bytes32,bytes)', [URD_DATA_KEY, deployURD.contractAddress])
   const executePayload = await myUP.interface.encodeFunctionData('execute(uint256,address,uint256,bytes)', [0, deployVault.contractAddress, 0, setDataPayload])

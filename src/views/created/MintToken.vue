@@ -44,7 +44,7 @@ const mint = async () => {
     return
   }
 
-  const { account, isEOAccount, signer } = await getEthers()
+  const { isEOAccount, signer } = await getEthers()
   if (isEOAccount) {
     isMinterEOA.value = true
   }

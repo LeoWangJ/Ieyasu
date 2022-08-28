@@ -29,7 +29,7 @@ export default createStore({
     }
   },
   actions: {
-    initAddress ({ commit, state }, address:string) {
+    initAddress ({ state }, address:string) {
       state.account = address
       state.currentAddress = address
       state.LSP10Vaults = { account: state.account, value: [] }

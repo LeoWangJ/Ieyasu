@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
 import { getEthers } from '@/composables/ethers'
 import { addVaultLength, settingURDAddressInStorage, setVaultList } from '@/composables/createEOA'
