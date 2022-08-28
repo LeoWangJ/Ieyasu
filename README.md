@@ -8,8 +8,12 @@ Take this name is expected to LUKSO able to dominate in various chains today.
 
 Ieyasu is a wallet can create, mint, transfer LSP7/LSP8 tokens, also provide vault for users to separate/transfer assets to protect user assets.
 
+Ieyasu also can grant permissions to 3rd party addresses to enable them to interact with our Universal Profile or use vault to restrict different addresses (protocols, other devices, etc..) to execute and set data on it instead of doing it directly on the Universal Profile.
+
 - support PC and Mobile,  beautiful UI facilitates user operation.
 - support UP extension and other EOA wallet to operation.
+
+
 
 # Project run
 ```
@@ -28,6 +32,39 @@ Website - [https://leowangj.github.io/leyasu/](https://leowangj.github.io/leyasu
 
 Youtube - [Universal Profile Tools - Token & NFT Wallet With Vault Manager](https://youtu.be/PxE2KuxBY0s)
 
+
+# Demo by Picture 
+- Show received assets
+![](./public/received.png)
+- Find legacy assets
+![](./public/find_legacy_assets.png)
+- Transfer LSP7/LSP8 assets
+![](./public/transfer.png)
+- Ttransfer lyx
+![](./public/transfer_lyx.png)
+- Show created assets
+![](./public/vaults.png)
+
+- Create LSP7/LSP8 token 
+![](./public/create_token.png)
+- Mint LSP7/LSP8 token 
+![](./public/mint_nft.png)
+- Show created vaults 
+![](./public/controllers.png)
+ You can switch checked to change owner or vaults to see received / transfer assets 
+- Create vault
+![](./public/create_vault.png)
+- Show created controllers 
+![](./public/created.png)
+
+- Grant permission
+![](./public/grant_permission.png)
+
+- Edit permission
+![](./public/edit_permission.png)
+
+- Restrict addresses to vaults
+![](./public/restrict_address_to_vaults.png)
 
 # Team
 [leowang](https://github.com/LeoWangJ)
