@@ -7,7 +7,7 @@ import ControllerList from './controllers/ControllerList.vue'
 import { onMounted, shallowRef, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Toast, Tab, Tabs } from 'vant'
-import { getEthers } from '@/composables/ethers'
+import { getEthers } from '@/composables/useEthers'
 import 'vant/es/toast/style'
 import store from '@/store'
 onMounted(async () => {

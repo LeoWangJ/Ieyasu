@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { getPermissionList } from '@/composables/createEOA'
-import { getEthers } from '@/composables/ethers'
+import { getPermissionList } from '@/composables/useERC725'
+import { getEthers } from '@/composables/useEthers'
 import { onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { Button, Toast, Dialog } from 'vant'

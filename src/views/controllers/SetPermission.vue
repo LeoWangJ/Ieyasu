@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { getAddressPermission, setKMPermission, setPermissionList, addPermissionLength } from '@/composables/createEOA'
-import { getEthers } from '@/composables/ethers'
+import { getAddressPermission, setKMPermission, setPermissionList, addPermissionLength } from '@/composables/useERC725'
+import { getEthers } from '@/composables/useEthers'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
 import { onMounted, reactive, ref } from 'vue'
 import { NoticeBar } from 'vant'

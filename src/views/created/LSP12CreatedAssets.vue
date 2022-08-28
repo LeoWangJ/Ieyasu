@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getEthers } from '@/composables/ethers'
+import { getEthers } from '@/composables/useEthers'
 import { COMMON_ABIS, INTERFACEID, IPFS_GATEWAY_BASE_URL, LOCATION } from '@/utils/config'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP12IssuedAssetsSchema from '@erc725/erc725.js/schemas/LSP12IssuedAssets.json'

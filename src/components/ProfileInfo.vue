@@ -7,7 +7,7 @@ import { IPFS_GATEWAY_BASE_URL } from '../utils/config'
 import { Tag, Toast } from 'vant'
 import { useClipboard } from '@vueuse/core'
 import { handlerIPFSImg } from '@/utils'
-import { getEthers } from '@/composables/ethers'
+import { getEthers } from '@/composables/useEthers'
 import BalanceOf from './BalanceOf.vue'
 
 interface Image {

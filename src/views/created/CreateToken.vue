@@ -6,7 +6,7 @@ import LSP12IssuedAssetsSchema from '@erc725/erc725.js/schemas/LSP12IssuedAssets
 import { IPFS_GATEWAY_BASE_URL, IPFS_GATEWAY_API_BASE_URL, BLOCKCHAIN_EXPLORER_BASE_URL, INTERFACEID } from '@/utils/config'
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { onMounted, reactive, ref } from 'vue'
-import { getEthers } from '@/composables/ethers'
+import { getEthers } from '@/composables/useEthers'
 import { ethers } from 'ethers'
 import { Toast, UploaderFileListItem } from 'vant'
 

@@ -57,7 +57,7 @@ interface SetPermissionList{
   btyesLength:string
 }
 
-export const createEOA = () => {
+export const useERC725 = () => {
   const myEOA = ethers.Wallet.createRandom()
   return myEOA
 }

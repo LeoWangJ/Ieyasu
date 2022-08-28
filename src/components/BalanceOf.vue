@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getEthers } from '@/composables/ethers'
+import { getEthers } from '@/composables/useEthers'
 import { ethers } from 'ethers'
 import { onMounted, reactive, ref } from 'vue'
 import { Dialog, Toast } from 'vant'

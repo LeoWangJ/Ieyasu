@@ -5,7 +5,7 @@ import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'
 import { NFT } from '@/utils/types'
 import { onMounted, ref } from 'vue'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
-import { getEthers } from '@/composables/ethers'
+import { getEthers } from '@/composables/useEthers'
 import { ethers, Signer } from 'ethers'
 import { Toast, NoticeBar } from 'vant'
 import { handlerIPFSImg } from '@/utils'
@@ -13,7 +13,7 @@ import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProf
 import LSP9Vault from '@lukso/lsp-smart-contracts/artifacts/LSP9Vault.json'
 
 import { useStore } from 'vuex'
-import { executeByKM } from '@/composables/createEOA'
+import { executeByKM } from '@/composables/useERC725'
 const store = useStore()
 
 const props = defineProps<{

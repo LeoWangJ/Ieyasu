@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
-import { getEthers } from '@/composables/ethers'
-import { addVaultLength, settingURDAddressInStorage, setVaultList } from '@/composables/createEOA'
+import { getEthers } from '@/composables/useEthers'
+import { addVaultLength, settingURDAddressInStorage, setVaultList } from '@/composables/useERC725'
 const props = defineProps<{
   vaultLength:number
 }>()

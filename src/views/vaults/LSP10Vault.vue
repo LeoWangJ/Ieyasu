@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js'
 import LSP10ReceivedVaultsSchema from '@erc725/erc725.js/schemas/LSP10ReceivedVaults.json'
-import { getEthers } from '@/composables/ethers'
+import { getEthers } from '@/composables/useEthers'
 import { Dialog, Toast, NoticeBar } from 'vant'
 import { useClipboard } from '@vueuse/core'
 import { addLuksoL16Testnet, isLuksoNetwork } from '@/utils/network'

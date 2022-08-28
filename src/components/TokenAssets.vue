@@ -6,7 +6,7 @@ import LSP7DigitalAssetSchema from '@lukso/lsp-smart-contracts/artifacts/LSP7Dig
 import { onMounted, reactive, ref, shallowRef } from 'vue'
 import type { Component } from 'vue'
 import { IPFS_GATEWAY_BASE_URL, LOCATION } from '@/utils/config'
-import { getEthers } from '@/composables/ethers'
+import { getEthers } from '@/composables/useEthers'
 import { handlerIPFSImg } from '@/utils'
 import { Cell, Dialog } from 'vant'
 import { ethers } from 'ethers'

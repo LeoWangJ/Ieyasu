@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { setVaultPermission } from '@/composables/createEOA'
-import { getEthers } from '@/composables/ethers'
 import { ref } from 'vue'
+import { setVaultPermission } from '@/composables/useERC725'
+import { getEthers } from '@/composables/useEthers'
 import { BLOCKCHAIN_EXPLORER_BASE_URL } from '@/utils/config'
 import { NoticeBar } from 'vant'
 

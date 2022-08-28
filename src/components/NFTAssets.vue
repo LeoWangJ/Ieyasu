@@ -5,7 +5,7 @@ import LSP4DigitalAssetSchema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.j
 import LSP7DigitalAssetSchema from '@lukso/lsp-smart-contracts/artifacts/LSP7DigitalAsset.json'
 import { onMounted, reactive, ref, shallowRef } from 'vue'
 import { IPFS_GATEWAY_BASE_URL, LSP8MetadataJSONSchema, LOCATION } from '@/utils/config'
-import { getEthers } from '@/composables/ethers'
+import { getEthers } from '@/composables/useEthers'
 import { handlerIPFSImg } from '@/utils'
 import { Cell, Dialog } from 'vant'
 import MintNFT from '@/views/created/MintNFT.vue'
