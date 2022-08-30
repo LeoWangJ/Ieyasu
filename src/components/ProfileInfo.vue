@@ -61,14 +61,14 @@ const copyHandler = () => {
 </script>
 
 <template>
-  <div class="mx-auto h-[55vw] w-full sm:(h-300px) relative">
+  <div class="mx-auto h-[55vw] w-full sm:h-300px relative">
     <van-image
-      class="h-[55vw] w-full sm:(h-300px)"
+      class="h-[55vw] w-full sm:h-300px"
       :src="handlerIPFSImg(info.backgroundImage[0]?.url)">
       <template #loading></template>
     </van-image>
     <div class="flex flex-col mt-[8%] text-primary w-full inset-0 absolute items-center">
-      <div class="rounded-full mx-auto h-[20vw] w-[20vw] overflow-hidden sm:(w-[129px] h-[129px]) ">
+      <div class="rounded-full mx-auto h-[20vw] w-[20vw] overflow-hidden sm:w-[129px] sm:h-[129px] ">
         <van-image
           round
           class="h-full w-full bg-[#fff]"

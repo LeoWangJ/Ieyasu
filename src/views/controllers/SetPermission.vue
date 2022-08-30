@@ -116,7 +116,7 @@ const clickNavBar = () => {
       </NoticeBar>
       <div class="text-primary m-2">Permissions</div>
       <LoadingAnimate v-if="loading"></LoadingAnimate>
-      <div v-else class="grid gap-x-1.5 gap-y-2  m-3 grid-cols-1 sm:(grid-cols-2) md:(grid-cols-3)">
+      <div v-else class="grid gap-x-1.5 gap-y-2  m-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
         <div v-for="permission in permissionsLis" :key="permission" class="flex items-center">
           <van-switch v-model="permissions[permission]" active-color="#FB9904" inactive-color="#dcdee0" />
           <span class="ml-2">{{permission}}</span>
