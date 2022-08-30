@@ -20,6 +20,9 @@ Ieyasu also can grant permissions to 3rd party addresses to enable them to inter
 yarn install 
 yarn serve
 ```
+
+# Project requirements
+ - Node v16.14.0
 # Project Code
 
 Repo - [https://github.com/LeoWangJ/Ieyasu](https://github.com/LeoWangJ/Ieyasu)
