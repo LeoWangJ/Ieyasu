@@ -158,7 +158,7 @@ const clickNavBar = () => {
     <van-nav-bar :title="`Transfer ${assets.name}(${assets.symbol})`" left-arrow @click-left="clickNavBar" />
     <van-steps :active="step" active-icon="success" class="my-2">
       <van-step>Input Information</van-step>
-      <van-step>Transition</van-step>
+      <van-step>Transaction</van-step>
       <van-step>🎉 Success</van-step>
     </van-steps>
     <NoticeBar color="#fff" background="#363636" wrapable  left-icon="info-o" v-if="!isL16Network">
@@ -185,7 +185,7 @@ const clickNavBar = () => {
       </div>
     </div>
     <div v-if="step == 1">
-      Transition... , please be patient!
+      Transaction... , please be patient!
     </div>
     <div v-if="step == 2" class="break-words">
       🎉 Success: tx hash: <a class="text-theme" :href="`${BLOCKCHAIN_EXPLORER_BASE_URL}/tx/${txHash}`" target="_blank">{{

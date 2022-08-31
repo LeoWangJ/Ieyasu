@@ -29,7 +29,7 @@ Repo - [https://github.com/LeoWangJ/Ieyasu](https://github.com/LeoWangJ/Ieyasu)
 
 # Working App
 
-Website - [https://leowangj.github.io/leyasu/](https://leowangj.github.io/leyasu/)
+Website - [https://leowangj.github.io/leyasu/](https://leyasu.netlify.app)
 
 # Demo Video
 
