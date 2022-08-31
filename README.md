@@ -29,11 +29,11 @@ Repo - [https://github.com/LeoWangJ/Ieyasu](https://github.com/LeoWangJ/Ieyasu)
 
 # Working App
 
-Website - [https://leyasu.netlify.app](https://leyasu.netlify.app)
+Website - [https://leowangj.github.io/Ieyasu](https://leowangj.github.io/Ieyasu)
 
 # Demo Video
 
-Youtube - Universal Profile Tools - Token & NFT Wallet With Vault Manager(At present, every transaction is waiting, I can't record Demo videos ) 
+Youtube - [Ieyasu - Universal Profile Tools - Token & NFT Wallet With Vault Manager](https://youtu.be/i3haMb6J-LM) 
 
 
 # Demo by Picture 
